@@ -46,7 +46,6 @@ namespace ToonyColorsPro
 				[Serialization.SerializeAs("op")] public Operator @operator = Operator.Multiply;      //How this implementation is calculated compared to the previous one
 				[Serialization.SerializeAs("lbl"), ExcludeFromCopy] public string Label = "Property Label";
 				[Serialization.SerializeAs("gpu_inst")] public bool IsGpuInstanced = false;
-				[Serialization.SerializeAs("dots_inst")] public bool IsDotsInstanced = false;
 				[Serialization.SerializeAs("locked"), ExcludeFromCopy] public bool IsLocked = false;
 				[Serialization.SerializeAs("impl_index"), ExcludeFromCopy] public int DefaultImplementationIndex = -1; // if >= 0, then this is a default implementation
 
@@ -177,7 +176,6 @@ namespace ToonyColorsPro
 					this.@operator = from.@operator;
 					this.Label = from.Label;
 					this.IsGpuInstanced = from.IsGpuInstanced;
-					this.IsDotsInstanced = from.IsDotsInstanced;
 
 					var from_mp = from as Imp_MaterialProperty;
 					var this_mp = this as Imp_MaterialProperty;
@@ -516,28 +514,9 @@ namespace ToonyColorsPro
 					{
 						bool highlighted = !IsDefaultImplementation ? IsGpuInstanced : IsGpuInstanced != GetDefaultImplementation<Imp_MaterialProperty>().IsGpuInstanced;
 						SGUILayout.InlineLabel("GPU Instanced", "Tag this property as a possible variant for GPU instancing", highlighted);
-						EditorGUI.BeginChangeCheck();
 						IsGpuInstanced = SGUILayout.Toggle(IsGpuInstanced);
-						if (EditorGUI.EndChangeCheck())
-							if (IsDotsInstanced && IsGpuInstanced)
-								IsDotsInstanced = false;
 					}
 					EndHorizontal();
-
-					if (ShaderGenerator2.IsURP)
-					{
-						BeginHorizontal();
-						{
-							bool highlighted = !IsDefaultImplementation ? IsDotsInstanced : IsDotsInstanced != GetDefaultImplementation<Imp_MaterialProperty>().IsDotsInstanced;
-							SGUILayout.InlineLabel("DOTS Instanced", "Tag this property as a supporting DOTS instancing", highlighted);
-							EditorGUI.BeginChangeCheck();
-							IsDotsInstanced = SGUILayout.Toggle(IsDotsInstanced);
-							if (EditorGUI.EndChangeCheck())
-								if (IsDotsInstanced && IsGpuInstanced)
-									IsGpuInstanced = false;
-						}
-						EndHorizontal();
-					}
 
 					BeginHorizontal();
 					GUILayout.Space(2);
@@ -2959,7 +2938,8 @@ namespace ToonyColorsPro
 
 				internal override string PrintVariableVertex(string inputSource, string outputSource, string arguments)
 				{
-					return $"{inputSource}.{"texcoord" + TexcoordChannel}.{Channels.ToLowerInvariant()}";
+					string coord = ShaderGenerator2.VariablesManager.GetVariable("texcoord" + TexcoordChannel);
+					return string.Format("{0}.{1}.xy", inputSource, string.IsNullOrEmpty(coord) ? "texcoord" + TexcoordChannel : coord);
 				}
 
 				internal override string PrintVariableFragment(string inputSource, string outputSource, string arguments)
@@ -2972,7 +2952,7 @@ namespace ToonyColorsPro
 					}
 					else
 					{
-						return $"{inputSource}.{coord}.{Channels.ToLowerInvariant()}";
+						return string.Format("{0}.{1}.xy", inputSource, coord);
 					}
 
 					//var hideChannels = TryGetArgument("hide_channels", arguments);

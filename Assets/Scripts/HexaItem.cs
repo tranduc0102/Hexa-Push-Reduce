@@ -12,6 +12,8 @@ public class HexaItem : MonoBehaviour
     private CellHexa _cellHexa;
     private int _number;
     private Tween moveTween;
+    public int Number => _number;
+    public Color Color => m_MeshRenderer.material.color;
 
     public void Init(ColorHexa color, int number)
     {
@@ -45,7 +47,7 @@ public class HexaItem : MonoBehaviour
             transform.DOScale(_baseScale, 0.25f).SetEase(Ease.OutBack);
         }
     }
-    public void MoveToCell(CellHexa targetCell, float duration = 0.25f)
+    public void MoveToCell(CellHexa targetCell, float duration = 1f)
     {
         if (_cellHexa != null)
             _cellHexa.ClearItem();
@@ -59,11 +61,11 @@ public class HexaItem : MonoBehaviour
             .SetEase(Ease.OutQuad)
             .OnComplete(() =>
             {
-                _baseScale.y *= _number;
-                transform.DOScale(_baseScale, 0.15f)
-                         .SetEase(Ease.OutBack)
+                transform.DOScaleY(transform.localScale.y * 1.5f, 0.2f)
+                         .SetEase(Ease.InOutSine)
                          .SetLoops(2, LoopType.Yoyo);
             });
+        transform.eulerAngles = targetCell.transform.eulerAngles;
     }
 }
 public enum ColorHexa

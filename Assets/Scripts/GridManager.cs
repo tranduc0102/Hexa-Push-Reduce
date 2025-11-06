@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 
@@ -9,43 +10,50 @@ public class GridManager : MonoBehaviour
     [SerializeField] private CellHexa _cellPrefab;
 
     [Header("Settings")]
-    public int _gridSize = 5;
+    public int _width = 10;
+    public int _heigh = 10;
     [SerializeField] private float moveDuration = 0.25f;
 
-    private List<CellHexa> allCells = new List<CellHexa>();
+    public List<CellHexa> allCells = new List<CellHexa>();
     private List<float> columnXs = new List<float>();
 
-    // ==========================================
-    // GRID GENERATION
-    // ==========================================
     [ContextMenu("Generate Grid")]
     public void GeneratorGrid()
     {
-        foreach (Transform obj in transform)
-            if (obj != transform) DestroyImmediate(obj.gameObject);
+        foreach (Transform child in transform)
+            DestroyImmediate(child.gameObject);
 
         allCells.Clear();
+        transform.localEulerAngles = Vector3.zero;
 
-        for (int x = -_gridSize; x <= _gridSize; x++)
+        float cellWidth = 0.85f;
+        float cellHeight = 0.75f;
+
+        float gridWidthWorld = (_width * 2 - 1) * cellWidth;
+        float gridHeightWorld = (_heigh * 2 - 1) * cellHeight;
+        Vector3 offsetCenter = new Vector3(gridWidthWorld / 2f, 0f, gridHeightWorld / 2f);
+
+        for (int row = -_heigh; row < _heigh; row++)
         {
-            for (int y = -_gridSize; y <= _gridSize; y++)
+            float offsetX = (row % 2 == 0) ? -cellWidth / 2f : 0f;
+
+            for (int col = -_width; col < _width; col++)
             {
-                Vector3 spawnPos = _grid.CellToWorld(new Vector3Int(x, y, 0));
-                if (spawnPos.magnitude > _grid.CellToWorld(new Vector3Int(0, 1, 0)).magnitude * _gridSize)
-                    continue;
+                float x = col * cellWidth + offsetX;
+                float z = row * cellHeight;
+
+                Vector3 spawnPos = new Vector3(x, 0f, z) - offsetCenter;
 
                 CellHexa cell = Instantiate(_cellPrefab, spawnPos, Quaternion.identity, transform);
-                cell.transform.localEulerAngles = Vector3.zero;
+                cell.name = $"Cell_{col}_{row}";
                 allCells.Add(cell);
             }
         }
-
+        transform.localEulerAngles = new Vector3(0f, 90f, 0f);
+        transform.position = new Vector3(transform.position.x + _heigh/2f + 0.65f, transform.position.y, transform.position.z);
         BuildColumnIndex();
     }
 
-    // ==========================================
-    // COLUMN / POSITION UTILS
-    // ==========================================
     private void BuildColumnIndex()
     {
         columnXs.Clear();
@@ -59,7 +67,6 @@ public class GridManager : MonoBehaviour
 
         columnXs.Sort();
     }
-
     public int GetNearestColumnX(float worldX)
     {
         if (columnXs.Count == 0)
@@ -99,68 +106,140 @@ public class GridManager : MonoBehaviour
         return column;
     }
 
-    public void InsertHexaInColumn(HexaItem hexa, int columnIndex)
+    public void InsertHexaInColumn(HexaItem hexa, int columnIndex, CellHexa targetCell)
     {
+        if(targetCell == null) return;
         List<CellHexa> column = GetCellsInColumn(columnIndex);
-        CellHexa targetCell = null;
-
-        for (int i = column.Count - 1; i >= 0; i--)
+        if (!targetCell.IsEmpty)
         {
-            if (column[i].IsEmpty)
-            {
-                targetCell = column[i];
-                break;
-            }
-        }
-
-        if (targetCell == null)
-        {
-            Debug.Log("❌ Cột đầy!");
+            ShiftColumnUp(hexa, column, targetCell);
             return;
         }
-
-        PushAndCascade(hexa, targetCell);
-    }
-
-    private void PushAndCascade(HexaItem hexa, CellHexa targetCell)
-    {
         hexa.MoveToCell(targetCell, moveDuration);
+        Debug.LogError(FloodFillSameType(targetCell).Count);
+    }
+    private void ShiftColumnUp(HexaItem hexa, List<CellHexa> column, CellHexa targetCell)
+    {
+        column.Sort((a, b) => a.transform.position.z.CompareTo(b.transform.position.z));
+
+        int index = column.IndexOf(targetCell);
+        for (int i = column.Count - 1; i > index; i--)
+        {
+            var below = column[i - 1];  
+            var current = column[i];   
+
+            if (!below.IsEmpty)
+            {
+                var item = below.Item;
+                item.MoveToCell(current, moveDuration);
+                Debug.LogError(FloodFillSameType(current).Count);
+                below.ClearItem();
+            }
+        }
+        hexa.MoveToCell(targetCell, moveDuration);
+        Debug.LogError(FloodFillSameType(targetCell).Count);
+        /*var collect = FloodFillSameType(targetCell);
+        if (collect.Count >= 3)
+        {
+            foreach (var VARIABLE in collect)
+            {
+                VARIABLE.Item.Collect();
+            }
+        }*/
     }
 
-
-    // ==========================================
-    // HIGHLIGHT CELL (Ô TRỐNG DƯỚI CÙNG CỦA CỘT)
-    // ==========================================
     public CellHexa GetNearestCellUnder(Vector3 worldPos)
     {
         int columnIndex = GetNearestColumnX(worldPos.x);
         var column = GetCellsInColumn(columnIndex);
-
-        // Sắp xếp theo Z tăng dần (xa dần ra sau)
         column.Sort((a, b) => a.transform.position.z.CompareTo(b.transform.position.z));
-
+        CellHexa lastBlockedCell = null;
         for (int i = column.Count - 1; i >= 0; i--)
         {
-            // Nếu cell này trống, nhưng cell phía trên nó (Oz nhỏ hơn) bị block thì đây là vị trí hợp lệ nhất
-            if (column[i].IsEmpty)
+            var cell = column[i];
+
+            if (cell.IsEmpty)
             {
                 bool blocked = false;
 
-                // Kiểm tra các cell phía trước (Oz nhỏ hơn)
                 for (int j = i - 1; j >= 0; j--)
                 {
                     if (!column[j].IsEmpty)
                     {
                         blocked = true;
-                        break;
+                        lastBlockedCell = column[j];
                     }
                 }
 
                 if (!blocked)
-                    return column[i];
+                    return cell;
             }
         }
 
-        return null; // Không có chỗ trống hợp lệ
+        if (lastBlockedCell != null)
+        {
+            int index = column.IndexOf(lastBlockedCell);
+            for (int j = index + 1; j < column.Count; j++)
+            {
+                if (column[j].IsEmpty)
+                {
+                    return lastBlockedCell;
+                }
+            }
+        }
+        return null;
     }
+    public List<CellHexa> FloodFillSameType(CellHexa startCell)
+    {
+        List<CellHexa> result = new List<CellHexa>();
+        if (startCell == null || startCell.IsEmpty)
+            return result;
+
+        HexaItem startItem = startCell.Item;
+        int targetNumber = startItem.Number;
+        Color targetColor = startItem.Color; 
+
+        Queue<CellHexa> queue = new Queue<CellHexa>();
+        HashSet<CellHexa> visited = new HashSet<CellHexa>();
+
+        queue.Enqueue(startCell);
+        visited.Add(startCell);
+
+        while (queue.Count > 0)
+        {
+            var cell = queue.Dequeue();
+            result.Add(cell);
+
+            foreach (var neighbor in GetNeighbors(cell))
+            {
+                if (neighbor == null || neighbor.IsEmpty || visited.Contains(neighbor))
+                    continue;
+
+                var item = neighbor.Item;
+                if (item.Number == targetNumber && item.Color == targetColor)
+                {
+                    queue.Enqueue(neighbor);
+                    visited.Add(neighbor);
+                }
+            }
+        }
+        return result;
+    }
+    private List<CellHexa> GetNeighbors(CellHexa cell)
+    {
+        List<CellHexa> neighbors = new List<CellHexa>();
+
+        foreach (var other in allCells)
+        {
+            if (other == cell)
+                continue;
+            if (Vector3.Distance(cell.transform.position, other.transform.position) < 0.9f)
+            {
+                neighbors.Add(other);
+            }
+        }
+
+        return neighbors;
+    }
+
 }
