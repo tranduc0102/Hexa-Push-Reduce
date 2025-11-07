@@ -1,60 +1,63 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
-[System.Serializable]
-public struct HexaSpawnData
-{
-    public ColorHexa color;
-    public int number;
-}
-
 public class GamePlayManager : MonoBehaviour
 {
     public static GamePlayManager Instance;
-    public GridManager grid;
-    public HexaSpawner spawnHexa;
+    [SerializeField] private GridManager grid;
+    [SerializeField] private HexaSpawner _hexaSpawner;
+    [SerializeField] private HexaDragController _hexaDragController;
+    public GridManager Grid => grid;
+    public HexaSpawner HexaSpawner => _hexaSpawner;
     public int Total = 0;
+
+    [Header("Config")]
+    [SerializeField] private List<Color> _colors;
+    public List<Color> Colors => _colors;
+    private int _spawnIndex = 0;
+    [SerializeField] private LevelData _currentLevel;
     private void Awake()
     {
         Instance = this;
     }
+
+    public int level;
     private void Start()
     {
-        grid.GeneratorGrid();
-        spawnHexa.SpawnInitialHexas(grid);
+        LoadLevvel(level);
     }
-    [Header("Config")]
-    [SerializeField] private List<Color> _colors;
-    public List<Color> Colors => _colors;
 
-    [Header("Spawn Pattern")]
-    [SerializeField] private List<HexaSpawnData> spawnPattern = new List<HexaSpawnData>();
-
-    private int _spawnIndex = 0;
-
-    public HexaSpawnData GetNextHexaData()
+    public void LoadLevvel(int level)
     {
-        if (spawnPattern.Count == 0)
+        _currentLevel = Resources.Load<LevelData>("Levels/Level " + level);
+        if (_currentLevel == null)
         {
-            Debug.LogWarning("⚠️ Spawn pattern is empty!");
+            Debug.LogError("XXXX"); return;
+        }
+        grid.GeneratorGrid(_currentLevel.width, _currentLevel.height, _currentLevel.CellDatas);
+        _hexaDragController.Init();
+        _hexaDragController.SetCurrentHexa(SpawnNextHexa());
+    }
+    private int GetNextHexaData()
+    {
+        if (_currentLevel.spawnPattern.Count == 0)
+        {
             return default;
         }
 
-        HexaSpawnData data = spawnPattern[_spawnIndex];
+        int data = _currentLevel.spawnPattern[_spawnIndex];
 
         _spawnIndex++;
-        if (_spawnIndex >= spawnPattern.Count)
+        if (_spawnIndex >= _currentLevel.spawnPattern.Count)
             _spawnIndex = 0;
 
         return data;
     }
-
-    public HexaItem SpawnNextHexa(HexaItem prefab, Transform parent)
+    public HexaItem SpawnNextHexa()
     {
         var data = GetNextHexaData();
 
-        HexaItem hexa = Instantiate(prefab, parent);
-        hexa.Init(data.color, data.number);
+        HexaItem hexa = _hexaSpawner.GetFromPool();
+        hexa.Init(data);
         return hexa;
     }
 }

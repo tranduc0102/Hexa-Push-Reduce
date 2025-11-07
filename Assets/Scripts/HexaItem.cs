@@ -19,7 +19,6 @@ public class HexaItem : MonoBehaviour
         set { _isChecking = value; }
     }
     private int _number;
-    private ColorHexa _colorType;
     private Color _color;
 
     public int Number => _number;
@@ -33,16 +32,14 @@ public class HexaItem : MonoBehaviour
         return new Color(r, g, b, alpha);
     }
 
-    public ColorHexa ColorType => _colorType;
     public CellHexa CurrentCell => _currentCell;
    
 
-    public void Init(ColorHexa colorType, int number)
+    public void Init(int number)
     {
-        _colorType = colorType;
         _number = number;
 
-        _color = GamePlayManager.Instance.Colors[(int)colorType];
+        _color = GamePlayManager.Instance.Colors[(int)(number - 1)];
         m_MeshRenderer.material.color = _color;
         m_txtNumber.text = _number.ToString();
         var baseScaleTemp = _baseScale;
@@ -85,6 +82,7 @@ public class HexaItem : MonoBehaviour
                         .SetEase(Ease.InOutSine)
                         .SetLoops(2, LoopType.Yoyo);
                 transform.SetParent(targetCell.transform);
+                IsChecking = false; 
             });
 
         transform.rotation = targetCell.transform.rotation;
@@ -111,7 +109,9 @@ public class HexaItem : MonoBehaviour
                 .OnComplete(() =>
                 {
                     _currentCell?.ClearItem();
-                    Destroy(gameObject);
+                    ClearCell();
+                    _canCollected = true;
+                    GamePlayManager.Instance.HexaSpawner.ReturnToPool(this);
                 });
                   
                 });
@@ -119,27 +119,16 @@ public class HexaItem : MonoBehaviour
         else
         {
             m_txtNumber.text = _number.ToString();
+            m_MeshRenderer.material.DOColor(GamePlayManager.Instance.Colors[(int)(_number - 1)], 0.2f);
             transform.DOScaleY(transform.localScale.y * 1.25f, 0.2f)
                         .SetEase(Ease.InOutSine).OnComplete(() =>
                         {
                             var baseScaleTemp = _baseScale;
                             baseScaleTemp.y *= Mathf.Max(1f, _number);
                             transform.DOScaleY(baseScaleTemp.y * 1.25f, 0.2f)
-                                        .SetEase(Ease.InOutSine).OnComplete(() => { _canCollected = true; IsChecking = false; });
+                                        .SetEase(Ease.InOutSine).OnComplete(() => { _canCollected = true;});
 
                         });
         }
     }
-}
-
-public enum ColorHexa
-{
-    Red = 0,
-    Blue = 1,
-    Yellow = 2,
-    Green = 3,
-    Pink = 4,
-    Purple = 5,
-    Orange = 6,
-    LightBlue = 7
 }

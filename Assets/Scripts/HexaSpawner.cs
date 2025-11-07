@@ -1,66 +1,57 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class HexaSpawner : MonoBehaviour
 {
-    [SerializeField] public HexaItem hexaPrefab;
-    public HexaDragController dragController;
+    [SerializeField] private HexaItem hexaPrefab;
+    private Queue<HexaItem> hexaPool = new Queue<HexaItem>();
 
-    private void Start()
+    [SerializeField] private int poolSize = 20;
+
+    private void Awake()
     {
-        dragController.SetCurrentHexa(GamePlayManager.Instance.SpawnNextHexa(hexaPrefab, transform));
+        for (int i = 0; i < poolSize; i++)
+        {
+            var obj = Instantiate(hexaPrefab, transform);
+            obj.transform.localPosition = Vector3.zero;
+            obj.gameObject.SetActive(false);
+            hexaPool.Enqueue(obj);
+        }
     }
-    public void SpawnInitialHexas(GridManager grid)
+
+    public HexaItem GetFromPool()
     {
-        if (grid == null)
+        if (hexaPool.Count == 0)
         {
-            Debug.LogError("❌ GridManager is null!");
-            return;
+            var newObj = Instantiate(hexaPrefab, transform);
+            newObj.gameObject.SetActive(false);
+            hexaPool.Enqueue(newObj);
         }
 
-        var totalColumns = grid._width;
+        var hexa = hexaPool.Dequeue();
+        hexa.gameObject.SetActive(true);
+        hexa.transform.localPosition = Vector3.zero;
+        return hexa;
+    }
+    public void ReturnToPool(HexaItem hexa)
+    {
+        hexa.gameObject.SetActive(false);
+        hexa.transform.SetParent(transform);
+        hexaPool.Enqueue(hexa);
+    }
+    public void SpawnHexa(CellHexa cell, int number)
+    {
+        if (cell == null) return;
 
-        int midColumn = totalColumns / 2;
-        var bottomCells = grid.GetCellsInColumn(midColumn);
-        if (bottomCells != null && bottomCells.Count > 0)
-        {
-            var bottomCell = bottomCells[0]; 
-            var bottomCell2 = bottomCells[1]; 
-            Vector3 spawnPos = bottomCell.transform.position + Vector3.up * 0.1f;
-            Vector3 spawnPos1 = bottomCell2.transform.position + Vector3.up * 0.1f;
-            var hexa1 = Instantiate(hexaPrefab, spawnPos, Quaternion.identity, bottomCell.transform);
-            var hexa2= Instantiate(hexaPrefab, spawnPos1, Quaternion.identity, bottomCell2.transform);
-            hexa1.Init(ColorHexa.Red, 1);
-            hexa2.Init(ColorHexa.Red, 1);
-            hexa1.transform.eulerAngles = bottomCell.transform.eulerAngles;
-            hexa2.transform.eulerAngles = bottomCell2.transform.eulerAngles;
-            bottomCell.SetItemHexa(hexa1);
-            bottomCell2.SetItemHexa(hexa2);
-            hexa1.SetCellHexa(bottomCell);
-            hexa2.SetCellHexa(bottomCell2);
-        }
+        Vector3 spawnPos = cell.transform.position + Vector3.up * 0.1f;
+        var hexa = GetFromPool();
 
-        int otherColumn = Mathf.Clamp(midColumn - 2, 0, totalColumns - 1);
-        var topCells = grid.GetCellsInColumn(otherColumn);
-        var topCells1 = grid.GetCellsInColumn(otherColumn + 2);
-        if (topCells != null && topCells.Count > 0)
-        {
-            var topCell = topCells[topCells.Count - 1]; 
-            Vector3 spawnPos = topCell.transform.position + Vector3.up * 0.1f;
-            var hexa2 = Instantiate(hexaPrefab, spawnPos, Quaternion.identity, topCell.transform);
-            hexa2.Init(ColorHexa.Red, 2);
-            hexa2.transform.eulerAngles = topCell.transform.eulerAngles;
-            topCell.SetItemHexa(hexa2);
-            hexa2.SetCellHexa(topCell);
-            hexa2.name = "Hexa";
+        hexa.transform.SetParent(cell.transform);
+        hexa.transform.position = spawnPos;
+        hexa.transform.rotation = cell.transform.rotation;
+        hexa.Init(number);
 
-            var topCell1 = topCells1[topCells1.Count - 1];
-            Vector3 spawnPos1 = topCell1.transform.position + Vector3.up * 0.1f;
-            var hexa21 = Instantiate(hexaPrefab, spawnPos1, Quaternion.identity, topCell1.transform);
-            hexa21.Init(ColorHexa.Red, 2);
-            hexa21.transform.eulerAngles = topCell1.transform.eulerAngles;
-            topCell1.SetItemHexa(hexa2);
-            hexa21.SetCellHexa(topCell1);
-            hexa21.name = "Hexa";
-        }
+        cell.SetItemHexa(hexa);
+        hexa.SetCellHexa(cell);
     }
 }

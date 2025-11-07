@@ -232,17 +232,17 @@ public class TCP2_OutlineInspector : MaterialEditor
 		}
 
 		//GUI
-		switch(property.propertyType)
+		switch(property.type)
 		{
-		case ShaderPropertyType.Color:
+		case MaterialProperty.PropType.Color:
 			ColorProperty(property, displayName);
 			break;
 
-		case ShaderPropertyType.Float:
+		case MaterialProperty.PropType.Float:
 			FloatProperty(property, displayName);
 			break;
 
-		case ShaderPropertyType.Range:
+		case MaterialProperty.PropType.Range:
 			EditorGUILayout.BeginHorizontal();
 			
 			//Add float field to Range parameters
@@ -262,16 +262,16 @@ public class TCP2_OutlineInspector : MaterialEditor
 			EditorGUILayout.EndHorizontal();
 			break;
 
-		case ShaderPropertyType.Texture:
+		case MaterialProperty.PropType.Texture:
 			TextureProperty(property, displayName);
 			break;
 
-		case ShaderPropertyType.Vector:
+		case MaterialProperty.PropType.Vector:
 			VectorProperty(property, displayName);
 			break;
 
 		default:
-			EditorGUILayout.LabelField("Unknown Material Property Type: " + property.propertyType);
+			EditorGUILayout.LabelField("Unknown Material Property Type: " + property.type);
 			break;
 		}
 

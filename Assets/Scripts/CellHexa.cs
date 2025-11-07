@@ -14,18 +14,14 @@ public class CellHexa : MonoBehaviour
     public bool IsEmpty => _item == null;
 
     [Header("Grid Coords (for logic, not transform)")]
-    public int q; // cột (col)
-    public int r; // hàng (row)
-
-    private Color _baseColor; // màu gốc để reset lại khi bỏ highlight
+    public int q;
+    public int r; 
+    private Color _baseColor;
     private Tween _colorTween;
-
+    public bool IsHidden => !_render.enabled;
     private void Awake()
     {
-        // Lưu màu gốc của material để reset nhanh
         _baseColor = _render.material.color;
-
-        // Ẩn text debug ban đầu
         if (_txt != null)
             _txt.gameObject.SetActive(false);
     }
@@ -33,11 +29,6 @@ public class CellHexa : MonoBehaviour
     {
         this.q = q;
         this.r = r;
-    }
-
-    public void SetCoords(int q, int r)
-    {
-        this.q = q;
     }
     public void SetItemHexa(HexaItem item)
     {
@@ -64,22 +55,14 @@ public class CellHexa : MonoBehaviour
     {
         _colorTween?.Kill();
 
-        // Reset về màu nền #545050 (hoặc màu gốc nếu muốn)
-        if (ColorUtility.TryParseHtmlString("#545050", out Color targetColor))
-            _colorTween = _render.material.DOColor(targetColor, 0.25f);
-        else
-            _colorTween = _render.material.DOColor(_baseColor, 0.25f);
+        _colorTween = _render.material.DOColor(_baseColor, 0.25f);
 
         if (_txt != null)
             _txt.gameObject.SetActive(false);
     }
-
-    //=========================================================
-    // DEBUG UTILS
-    //=========================================================
-    private void OnDrawGizmosSelected()
+    public void HideVisual()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 0.15f);
+        if (_render) _render.enabled = false;
     }
+
 }
