@@ -13,6 +13,7 @@ public class GamePlayManager : MonoBehaviour
     public static GamePlayManager Instance;
     public GridManager grid;
     public HexaSpawner spawnHexa;
+    public int Total = 0;
     private void Awake()
     {
         Instance = this;
@@ -23,7 +24,7 @@ public class GamePlayManager : MonoBehaviour
         spawnHexa.SpawnInitialHexas(grid);
     }
     [Header("Config")]
-    [SerializeField] private List<Color> _colors; // Bảng màu tương ứng ColorHexa enum
+    [SerializeField] private List<Color> _colors;
     public List<Color> Colors => _colors;
 
     [Header("Spawn Pattern")]
@@ -31,9 +32,6 @@ public class GamePlayManager : MonoBehaviour
 
     private int _spawnIndex = 0;
 
-    /// <summary>
-    /// Trả về viên Hexa tiếp theo trong chuỗi spawn (lặp lại)
-    /// </summary>
     public HexaSpawnData GetNextHexaData()
     {
         if (spawnPattern.Count == 0)
@@ -51,9 +49,6 @@ public class GamePlayManager : MonoBehaviour
         return data;
     }
 
-    /// <summary>
-    /// Sinh ra 1 HexaItem prefab sẵn sàng dùng
-    /// </summary>
     public HexaItem SpawnNextHexa(HexaItem prefab, Transform parent)
     {
         var data = GetNextHexaData();

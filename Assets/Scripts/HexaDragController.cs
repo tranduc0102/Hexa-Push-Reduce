@@ -67,7 +67,7 @@ public class HexaDragController : MonoBehaviour
 
                     if (nearest != null)
                     {
-                        nearest.HighLight();
+                        nearest.HighLight(currentHexa.GetTransparentColor());
                     }
 
                     currentHighlightCell = nearest;
@@ -87,11 +87,24 @@ public class HexaDragController : MonoBehaviour
 
             int columnX = gridManager.GetNearestColumnX(currentHexa.transform.position.x);
 
-            gridManager.InsertHexaInColumn(currentHexa, columnX, nearest);
+            bool placed = gridManager.InsertHexaInColumn(currentHexa, columnX, nearest);
             nearest = null;
 
-            currentHexa = null;
+            if (placed)
+            {
+                currentHexa = GamePlayManager.Instance.SpawnNextHexa(
+                    GamePlayManager.Instance.spawnHexa.hexaPrefab,
+                    GamePlayManager.Instance.spawnHexa.transform
+                );
+
+                SetCurrentHexa(currentHexa);
+            }
+            else
+            {
+               
+            }
         }
+
     }
 
     public void SetCurrentHexa(HexaItem hexa)

@@ -1,6 +1,5 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class HexaItem : MonoBehaviour
@@ -8,66 +7,131 @@ public class HexaItem : MonoBehaviour
     [Header("Render")]
     [SerializeField] private MeshRenderer m_MeshRenderer;
     [SerializeField] private TextMeshPro m_txtNumber;
-    [SerializeField] private Vector3 _baseScale;
-    private CellHexa _cellHexa;
-    private int _number;
+    [SerializeField] private Vector3 _baseScale = Vector3.one;
+    private bool _canCollected = true;
+    public bool CanCollected => _canCollected;
+    private CellHexa _currentCell;
     private Tween moveTween;
+    private bool _isChecking = false;
+    public bool IsChecking
+    {
+        get {  return _isChecking; }
+        set { _isChecking = value; }
+    }
+    private int _number;
+    private ColorHexa _colorType;
+    private Color _color;
+
     public int Number => _number;
-    public Color Color => m_MeshRenderer.material.color;
-
-    public void Init(ColorHexa color, int number)
+    public Color Color => _color;
+    public Color GetTransparentColor(float alpha = 0.5f, float addValue = 25f)
     {
-        m_MeshRenderer.material.color = GamePlayManager.Instance.Colors[(int)color];
-        m_txtNumber.text = number.ToString();
-        _baseScale.y *= number;
-        transform.localScale = _baseScale;
+        float delta = addValue / 255f;
+        float r = Mathf.Clamp01(_color.r + delta);
+        float g = Mathf.Clamp01(_color.g + delta);
+        float b = Mathf.Clamp01(_color.b + delta);
+        return new Color(r, g, b, alpha);
+    }
+
+    public ColorHexa ColorType => _colorType;
+    public CellHexa CurrentCell => _currentCell;
+   
+
+    public void Init(ColorHexa colorType, int number)
+    {
+        _colorType = colorType;
         _number = number;
-    }
-    public void SetCellHexa(CellHexa cellHexa)
-    {
-        _cellHexa = cellHexa;
-        _cellHexa.SetItemHexa(this);
-    }
-    public void Collect()
-    {
-        _number -= 1;
 
-        if (_number <= 0)
+        _color = GamePlayManager.Instance.Colors[(int)colorType];
+        m_MeshRenderer.material.color = _color;
+        m_txtNumber.text = _number.ToString();
+        var baseScaleTemp = _baseScale;
+        baseScaleTemp.y *= Mathf.Max(1f, _number);
+        transform.localScale = baseScaleTemp;
+    }
+
+ 
+    public void SetCellHexa(CellHexa cell)
+    {
+        _currentCell = cell;
+        _currentCell?.SetItemHexa(this);
+    }
+
+    public void ClearCell()
+    {
+        if (_currentCell != null)
         {
-            transform.DOScale(Vector3.zero, 0.3f).SetEase(Ease.InBack).OnComplete(() =>
-            {
-                _cellHexa?.ClearItem();
-                Destroy(gameObject);
-            });
-        }
-        else
-        {
-            m_txtNumber.text = _number.ToString();
-            _baseScale.y *= _number;
-            transform.DOScale(_baseScale, 0.25f).SetEase(Ease.OutBack);
+            _currentCell.ClearItem();
+            _currentCell = null;
         }
     }
-    public void MoveToCell(CellHexa targetCell, float duration = 1f)
-    {
-        if (_cellHexa != null)
-            _cellHexa.ClearItem();
 
-        _cellHexa = targetCell;
+    public void MoveToCell(CellHexa targetCell, float duration = 0.3f)
+    {
+        if (targetCell == null) return;
+
+        if (_currentCell != null)
+            _currentCell.ClearItem();
+
+        _currentCell = targetCell;
         targetCell.SetItemHexa(this);
 
         moveTween?.Kill();
-
         moveTween = transform.DOMove(targetCell.transform.position + Vector3.up * 0.1f, duration)
             .SetEase(Ease.OutQuad)
             .OnComplete(() =>
             {
-                transform.DOScaleY(transform.localScale.y * 1.5f, 0.2f)
-                         .SetEase(Ease.InOutSine)
-                         .SetLoops(2, LoopType.Yoyo);
+                transform.DOScaleY(transform.localScale.y * 1.25f, 0.2f)
+                        .SetEase(Ease.InOutSine)
+                        .SetLoops(2, LoopType.Yoyo);
+                transform.SetParent(targetCell.transform);
             });
-        transform.eulerAngles = targetCell.transform.eulerAngles;
+
+        transform.rotation = targetCell.transform.rotation;
+    }
+    private void OnDestroy()
+    {
+        transform.DOKill();
+    }
+    public void Collect()
+    {
+        if(!_canCollected) return;
+        _canCollected = false;
+        _number -= 1;
+        GamePlayManager.Instance.Total += 1;
+        Debug.LogError(GamePlayManager.Instance.Total);
+        if (_number <= 0)
+        {
+            transform.DOScaleY(transform.localScale.y * 1.25f, 0.2f)
+                        .SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo)
+                .OnComplete(() =>
+                {
+                    transform.DOScale(0, 0.2f)
+                        .SetEase(Ease.InOutSine)
+                .OnComplete(() =>
+                {
+                    _currentCell?.ClearItem();
+                    Destroy(gameObject);
+                });
+                  
+                });
+        }
+        else
+        {
+            m_txtNumber.text = _number.ToString();
+            transform.DOScaleY(transform.localScale.y * 1.25f, 0.2f)
+                        .SetEase(Ease.InOutSine).OnComplete(() =>
+                        {
+                            var baseScaleTemp = _baseScale;
+                            baseScaleTemp.y *= Mathf.Max(1f, _number);
+                            transform.DOScaleY(baseScaleTemp.y * 1.25f, 0.2f)
+                                        .SetEase(Ease.InOutSine).OnComplete(() => { _canCollected = true; IsChecking = false; });
+
+                        });
+        }
     }
 }
+
 public enum ColorHexa
 {
     Red = 0,

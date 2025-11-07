@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using DG.Tweening;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour
@@ -29,30 +30,48 @@ public class GridManager : MonoBehaviour
         float cellWidth = 0.85f;
         float cellHeight = 0.75f;
 
-        float gridWidthWorld = (_width * 2 - 1) * cellWidth;
-        float gridHeightWorld = (_heigh * 2 - 1) * cellHeight;
-        Vector3 offsetCenter = new Vector3(gridWidthWorld / 2f, 0f, gridHeightWorld / 2f);
-
-        for (int row = -_heigh; row < _heigh; row++)
+        for (int r = -_heigh; r < _heigh; r++)
         {
-            float offsetX = (row % 2 == 0) ? -cellWidth / 2f : 0f;
+            float offsetX = (r % 2 == 0) ? -cellWidth / 2f : 0f;
 
-            for (int col = -_width; col < _width; col++)
+            for (int q = -_width; q < _width; q++)
             {
-                float x = col * cellWidth + offsetX;
-                float z = row * cellHeight;
+                float x = q * cellWidth + offsetX;
+                float z = r * cellHeight;
+                Vector3 pos = new Vector3(x, 0f, z);
 
-                Vector3 spawnPos = new Vector3(x, 0f, z) - offsetCenter;
-
-                CellHexa cell = Instantiate(_cellPrefab, spawnPos, Quaternion.identity, transform);
-                cell.name = $"Cell_{col}_{row}";
+                var cell = Instantiate(_cellPrefab, pos, Quaternion.identity, transform);
+                cell.InitCoords(q, r);
+                cell.name = $"Cell_{q}_{r}";
                 allCells.Add(cell);
             }
         }
+
+        Vector3 min = new Vector3(float.MaxValue, 0, float.MaxValue);
+        Vector3 max = new Vector3(float.MinValue, 0, float.MinValue);
+
+        foreach (var c in allCells)
+        {
+            Vector3 p = c.transform.localPosition;
+            if (p.x < min.x) min.x = p.x;
+            if (p.z < min.z) min.z = p.z;
+            if (p.x > max.x) max.x = p.x;
+            if (p.z > max.z) max.z = p.z;
+        }
+
+        Vector3 center = (min + max) / 2f;
+
+        foreach (var c in allCells)
+        {
+            c.transform.localPosition -= center;
+        }
+
         transform.localEulerAngles = new Vector3(0f, 90f, 0f);
-        transform.position = new Vector3(transform.position.x + _heigh/2f + 0.65f, transform.position.y, transform.position.z);
+        transform.position = new Vector3(0, 0, 3f);
+
         BuildColumnIndex();
     }
+
 
     private void BuildColumnIndex()
     {
@@ -105,49 +124,229 @@ public class GridManager : MonoBehaviour
         column.Sort((a, b) => a.transform.position.z.CompareTo(b.transform.position.z));
         return column;
     }
-
-    public void InsertHexaInColumn(HexaItem hexa, int columnIndex, CellHexa targetCell)
+    public bool InsertHexaInColumn(HexaItem hexa, int columnIndex, CellHexa targetCell)
     {
-        if(targetCell == null) return;
-        List<CellHexa> column = GetCellsInColumn(columnIndex);
+        if (targetCell == null) return false;
+
+        var column = GetCellsInColumn(columnIndex);
+
         if (!targetCell.IsEmpty)
         {
-            ShiftColumnUp(hexa, column, targetCell);
-            return;
+            return ShiftColumnUp(hexa, column, targetCell);
         }
+
         hexa.MoveToCell(targetCell, moveDuration);
-        Debug.LogError(FloodFillSameType(targetCell).Count);
+        CheckAndCollect(targetCell, moveDuration + 0.5f);
+        return true;
     }
-    private void ShiftColumnUp(HexaItem hexa, List<CellHexa> column, CellHexa targetCell)
+    private bool ShiftColumnUp(HexaItem hexa, List<CellHexa> column, CellHexa targetCell)
     {
+        bool result = false;
         column.Sort((a, b) => a.transform.position.z.CompareTo(b.transform.position.z));
 
         int index = column.IndexOf(targetCell);
+        List<CellHexa> movedCells = new List<CellHexa>();
+
         for (int i = column.Count - 1; i > index; i--)
         {
-            var below = column[i - 1];  
-            var current = column[i];   
+            var below = column[i - 1];
+            var current = column[i];
 
             if (!below.IsEmpty)
             {
                 var item = below.Item;
                 item.MoveToCell(current, moveDuration);
-                Debug.LogError(FloodFillSameType(current).Count);
                 below.ClearItem();
+                movedCells.Add(current); 
+                result = true;
             }
         }
+
         hexa.MoveToCell(targetCell, moveDuration);
-        Debug.LogError(FloodFillSameType(targetCell).Count);
-        /*var collect = FloodFillSameType(targetCell);
-        if (collect.Count >= 3)
+        movedCells.Add(targetCell);
+
+        DOVirtual.DelayedCall(moveDuration + 0.1f, () =>
         {
-            foreach (var VARIABLE in collect)
+            foreach (var movedCell in movedCells)
             {
-                VARIABLE.Item.Collect();
+                CheckAndCollect(movedCell, 0.05f);
             }
-        }*/
+        });
+
+        return result;
     }
 
+    private void CheckAndCollect(CellHexa startCell, float delay = 0f)
+    {
+        DOVirtual.DelayedCall(delay, () =>
+        {
+            StartCoroutine(CollectCascade(startCell));
+        });
+    }
+    private IEnumerator CollectCascade(CellHexa startCell)
+    {
+        if (startCell.Item.IsChecking) yield break;
+        startCell.Item.IsChecking = true;
+        HashSet<CellHexa> processed = new HashSet<CellHexa>();
+        Queue<CellHexa> toCheck = new Queue<CellHexa>();
+
+        if (startCell == null || startCell.IsEmpty)
+            yield break;
+
+        toCheck.Enqueue(startCell);
+        
+        while (toCheck.Count > 0)
+        {
+            var current = toCheck.Dequeue();
+            if (current == null || current.IsEmpty || processed.Contains(current))
+                continue;
+
+            var group = FloodFillSameType(current);
+            foreach (var g in group)
+            {
+                g.Item.IsChecking = true;
+                processed.Add(g);
+            }
+
+            if (group.Count < 3)
+                continue;
+
+            yield return StartCoroutine(WaveCollectEffect(current, group));
+
+
+            yield return new WaitForSeconds(0.45f);
+
+            var neighborCandidates = new HashSet<CellHexa>();
+            foreach (var c in group)
+            {
+                foreach (var n in GetHexNeighbors(c))
+                {
+                    if (n != null && !n.IsEmpty && !processed.Contains(n))
+                    {
+                        if (n.Item.ColorType == group[0].Item.ColorType &&
+                            n.Item.Number == group[0].Item.Number)
+                        {
+                            n.Item.IsChecking = true;
+                            neighborCandidates.Add(n);
+                        }
+                    }
+                }
+            }
+
+            foreach (var candidate in neighborCandidates)
+            {
+                var newGroup = FloodFillSameType(candidate);
+                if (newGroup.Count >= 3 && !processed.Contains(candidate))
+                {
+                    yield return StartCoroutine(WaveCollectEffect(candidate, newGroup));
+
+                    foreach (var c in newGroup)
+                    {
+                        c.Item.IsChecking = true;
+                        processed.Add(c);
+                    }
+
+                    yield return new WaitForSeconds(0.45f);
+                    foreach (var c in newGroup)
+                    {
+                        foreach (var n in GetHexNeighbors(c))
+                        {
+                            if (n != null && !n.IsEmpty && !processed.Contains(n))
+                                toCheck.Enqueue(n);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private IEnumerator WaveCollectEffect(CellHexa startCell, List<CellHexa> group)
+    {
+        if (group == null || group.Count == 0) yield break;
+
+        float waveSpeed = 6f;
+
+        foreach (var cell in group.OrderBy(c => Vector3.Distance(c.transform.position, startCell.transform.position)))
+        {
+            if (cell.Item == null) continue;
+
+            float dist = Vector3.Distance(cell.transform.position, startCell.transform.position);
+            float delay = dist / waveSpeed;
+
+            DOVirtual.DelayedCall(delay, () =>
+            {
+                cell.Item.Collect();
+            });
+        }
+
+        yield return new WaitForSeconds(0.25f);
+    }
+
+    public List<CellHexa> FloodFillSameType(CellHexa startCell)
+    {
+        List<CellHexa> result = new List<CellHexa>();
+        if (startCell == null || startCell.IsEmpty)
+            return result;
+
+        var startItem = startCell.Item;
+        int targetNumber = startItem.Number;
+        var targetColor = startItem.ColorType;
+
+        Queue<CellHexa> queue = new Queue<CellHexa>();
+        HashSet<CellHexa> visited = new HashSet<CellHexa>();
+
+        queue.Enqueue(startCell);
+        visited.Add(startCell);
+
+        while (queue.Count > 0)
+        {
+            var cell = queue.Dequeue();
+            result.Add(cell);
+
+            foreach (var n in GetHexNeighbors(cell))
+            {
+                if (n == null || n.IsEmpty || visited.Contains(n))
+                    continue;
+
+                var item = n.Item;
+                if (item.Number == targetNumber && item.ColorType == targetColor)
+                {
+                    queue.Enqueue(n);
+                    visited.Add(n);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private List<CellHexa> GetHexNeighbors(CellHexa cell)
+    {
+        int[][] dirsEven = new int[][]
+        {
+            new[]{+1, 0}, new[]{0, +1}, new[]{-1, +1},
+            new[]{-1, 0}, new[]{-1, -1}, new[]{0, -1}
+        };
+
+        int[][] dirsOdd = new int[][]
+        {
+            new[]{+1, 0}, new[]{+1, +1}, new[]{0, +1},
+            new[]{-1, 0}, new[]{0, -1}, new[]{+1, -1}
+        };
+
+        var list = new List<CellHexa>();
+        var dirs = (cell.r % 2 == 0) ? dirsEven : dirsOdd;
+
+        foreach (var dir in dirs)
+        {
+            int nq = cell.q + dir[0];
+            int nr = cell.r + dir[1];
+            var neighbor = allCells.FirstOrDefault(c => c.q == nq && c.r == nr);
+            if (neighbor != null)
+                list.Add(neighbor);
+        }
+
+        return list;
+    }
     public CellHexa GetNearestCellUnder(Vector3 worldPos)
     {
         int columnIndex = GetNearestColumnX(worldPos.x);
@@ -189,57 +388,4 @@ public class GridManager : MonoBehaviour
         }
         return null;
     }
-    public List<CellHexa> FloodFillSameType(CellHexa startCell)
-    {
-        List<CellHexa> result = new List<CellHexa>();
-        if (startCell == null || startCell.IsEmpty)
-            return result;
-
-        HexaItem startItem = startCell.Item;
-        int targetNumber = startItem.Number;
-        Color targetColor = startItem.Color; 
-
-        Queue<CellHexa> queue = new Queue<CellHexa>();
-        HashSet<CellHexa> visited = new HashSet<CellHexa>();
-
-        queue.Enqueue(startCell);
-        visited.Add(startCell);
-
-        while (queue.Count > 0)
-        {
-            var cell = queue.Dequeue();
-            result.Add(cell);
-
-            foreach (var neighbor in GetNeighbors(cell))
-            {
-                if (neighbor == null || neighbor.IsEmpty || visited.Contains(neighbor))
-                    continue;
-
-                var item = neighbor.Item;
-                if (item.Number == targetNumber && item.Color == targetColor)
-                {
-                    queue.Enqueue(neighbor);
-                    visited.Add(neighbor);
-                }
-            }
-        }
-        return result;
-    }
-    private List<CellHexa> GetNeighbors(CellHexa cell)
-    {
-        List<CellHexa> neighbors = new List<CellHexa>();
-
-        foreach (var other in allCells)
-        {
-            if (other == cell)
-                continue;
-            if (Vector3.Distance(cell.transform.position, other.transform.position) < 0.9f)
-            {
-                neighbors.Add(other);
-            }
-        }
-
-        return neighbors;
-    }
-
 }

@@ -244,6 +244,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GamePlayManager
   grid: {fileID: 1851419769}
   spawnHexa: {fileID: 849293900}
+  Total: 0
   _colors:
   - {r: 0.96862745, g: 0.20784314, b: 0.27058825, a: 1}
   - {r: 0.1764706, g: 0.38039216, b: 1, a: 1}
@@ -254,10 +255,10 @@ MonoBehaviour:
   - {r: 0.972549, g: 0.54509807, b: 0.08235294, a: 1}
   - {r: 0.23529412, g: 0.7411765, b: 1, a: 1}
   spawnPattern:
-  - color: 0
-    number: 1
-  - color: 0
+  - color: 2
     number: 2
+  - color: 3
+    number: 1
   - color: 0
     number: 1
   - color: 0
@@ -352,13 +353,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.8365164, y: -0.12940949, z: 0.22414386, w: 0.48296288}
+  m_LocalRotation: {x: 0.48296294, y: -0.22414385, z: 0.1294095, w: 0.8365163}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 120, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: -30, z: 0}
 --- !u!1 &849293899
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,8 +400,8 @@ Transform:
   m_GameObject: {fileID: 849293899}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -7}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -4}
+  m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -513,8 +514,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -538,13 +539,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 8.62, z: -10}
+  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: 0, y: 10, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
 --- !u!1 &1851419767
 GameObject:
   m_ObjectHideFlags: 0
@@ -590,7 +591,7 @@ MonoBehaviour:
   _grid: {fileID: 1851419768}
   _cellPrefab: {fileID: 5444805754783366068, guid: 8664f63eb647dbc4a90afd9e3fc31cb9, type: 3}
   _width: 2
-  _heigh: 3
+  _heigh: 2
   moveDuration: 0.3
   allCells: []
 --- !u!4 &1851419770
