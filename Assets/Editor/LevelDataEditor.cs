@@ -140,7 +140,7 @@ public class LevelDataEditor : Editor
         float gridWidth = level.width * 2 * CELL_SIZE;
         float gridHeight = level.height * 2 * CELL_SIZE;
 
-        float startX = (EditorGUIUtility.currentViewWidth - gridWidth) / 2f;
+        float startX = (EditorGUIUtility.currentViewWidth - gridWidth) / 20f;
 
         float startY = 250f - gridHeight / 2f; 
 

@@ -1,5 +1,5 @@
 Toony Colors Pro, version 2.9
-2023/04/03
+2023/11/07
 © 2023 - Jean Moreno
 =============================
 
@@ -37,6 +37,32 @@ UPDATE NOTES
 ------------
 
 See full and formatted changelog here: https://jeanmoreno.com/unity/toonycolorspro/doc/changelog
+
+2.9.10
+#### Fixed
+- [Shader Generator 2] Fixed error when updating a shader generated with a version prior to TCP2 2.9.7
+- [Shader Generator 2] Fixed compilation errors when Vertex UV is used outside the XY channels as general data
+
+2.9.9
+#### Added
+- [Shader Generator 2] (URP) Added DOTS instancing support: enable it in the OPTIONS section of the FEATURES tab, and then enable "DOTS Instanced" on the properties you want in the SHADER PROPERTIES tab
+
+2.9.8
+#### Added
+- [Hybrid Shader 2] (URP)(BIRP) Added/fixed support for Realtime Global Illumination (Enlighten) for both render pipelines
+- [Shader Generator 2] (URP) Added support for Realtime Global Illumination (Enlighten)
+#### Fixed
+- [Shader Generator 2] Fixed Shader Generator 2 broken with URP template in last update
+
+2.9.7
+#### Added
+- [Shader Generator 2] Added the ability to change the default blending of "Material Layers", which use linear interpolation (lerp). Custom blending formulas are also possible, see the documentation.
+- [Hybrid Shader 2] Added DOTS instancing support for the "Hybrid Shader 2" (needs to be explicitly enabled in the shader inspector)
+#### Fixed
+- [Shader Generator 2] (URP) Fixed a specular bug with "Visible over shadows" option enabled, where specular could pop out when going out of an additional light's volume
+- [Shader Generator 2] Prevent NaNs on some platforms when using "Anisotropic Specular" feature
+- [Shader Generator 2] Code Injection: fixed parsing line breaks for the replacement blocks (multi-line replacements)
+- [Hybrid Shader 2][Shader Generator 2] Fixed possible precision issues with specular on mobile or low-precision platforms
 
 2.9.6
 #### Fixed

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 834f28aa5b83c6549b4390915f15d2f4, type: 3}
+  m_Name: UVEditorSettings
+  m_EditorClassIdentifier: 
+  LogLevel: 1
+  DoNotCropTextureNames: []
+  ScrollWheelSensitivity: 1
+  ExtractedFilesLocation: UVEditorAssets/
+  LogFilePaths: 0
+  DisableOnHierarchyChange: 1
+  TriggerSelectLinked: 115
+  MaxSelectLinkedDuration: 10
+  ShowSelectLinkedFailedPopup: 1
+  SelectionColorAlpha: 0.5
+  SelectionColorSubMeshes:
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.5, a: 1}
+  - {r: 0, g: 1, b: 0.75, a: 1}
+  - {r: 0.75, g: 1, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  WarnAboutOldSelections: 1
+  ClearOldSelectionsAutomatically: 0
+  AskBeforeReplacingExistingSelectionSnapshot: 1
+  ShowSelectedObjectPositionWarning: 1
+  RedoKey: 121
+  UndoKey: 122
+  WindowPosition: {x: -1, y: -1}
+  SelectionSnapshots: []

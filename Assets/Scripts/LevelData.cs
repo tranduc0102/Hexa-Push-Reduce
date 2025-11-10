@@ -12,6 +12,9 @@ public class LevelData : ScriptableObject
     public List<int> spawnPattern;
     public List<CellData> CellDatas;
     public string spaw;
+    public float offSetY;
+    public float camSize;
+    public float offsetZCam;
 }
 
 [System.Serializable]

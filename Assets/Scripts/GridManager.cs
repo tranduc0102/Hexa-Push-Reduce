@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,24 +7,34 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    [Header("References")] [SerializeField]
-    public Grid _grid;
-
+    [Header("References")]
+    [SerializeField] private Grid _grid;
     [SerializeField] private CellHexa _cellPrefab;
-
     [SerializeField] private float moveDuration = 0.25f;
     [SerializeField] private BoxCollider _collider;
 
     public List<CellHexa> AllCells = new List<CellHexa>();
-    private List<float> columnXs = new List<float>();
+
+    private readonly Dictionary<(int q, int r), CellHexa> cellLookup = new();
+    private readonly Dictionary<int, List<CellHexa>> columnCache = new();
+    private readonly List<float> columnXs = new();
+    private readonly HashSet<CellHexa> pendingCollectChecks = new();
+
+    private readonly Queue<CellHexa> collectQueue = new();
+    private bool isCollecting = false;
+
+    #region GRID GENERATION
 
     [ContextMenu("Generate Grid")]
-    public void GeneratorGrid(int width, int height, List<CellData> cells)
+    public void GeneratorGrid(int width, int height, List<CellData> cells, float offSetZ)
     {
-        foreach (Transform child in transform)
-            DestroyImmediate(child.gameObject);
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        }
 
         AllCells.Clear();
+        cellLookup.Clear();
         transform.localEulerAngles = Vector3.zero;
 
         float cellWidth = 0.85f;
@@ -36,8 +47,6 @@ public class GridManager : MonoBehaviour
             for (int q = -width; q < width; q++)
             {
                 var cellData = cells.Find(c => c.q == q && c.r == r);
-                
-
                 float x = q * cellWidth + offsetX;
                 float z = r * cellHeight;
                 Vector3 pos = new Vector3(x, 0f, z);
@@ -45,12 +54,15 @@ public class GridManager : MonoBehaviour
                 var cell = Instantiate(_cellPrefab, pos, Quaternion.identity, transform);
                 cell.InitCoords(q, r);
                 cell.name = $"Cell_{q}_{r}";
+
                 if (cellData != null && cellData.isHidden)
                 {
                     cell.HideVisual();
                     continue;
                 }
+
                 AllCells.Add(cell);
+                cellLookup[(q, r)] = cell;
 
                 if (cellData?.spawnHexaData > 0)
                 {
@@ -64,7 +76,7 @@ public class GridManager : MonoBehaviour
 
         foreach (var c in AllCells)
         {
-            if(c.IsHidden) return;
+            if (c.IsHidden) continue;
             Vector3 p = c.transform.localPosition;
             if (p.x < min.x) min.x = p.x;
             if (p.z < min.z) min.z = p.z;
@@ -73,37 +85,50 @@ public class GridManager : MonoBehaviour
         }
 
         Vector3 center = (min + max) / 2f;
-
         foreach (var c in AllCells)
             c.transform.localPosition -= center;
 
         transform.localEulerAngles = new Vector3(0f, 90f, 0f);
-        transform.position = new Vector3(0, 0, 3f);
-        _collider.size = new Vector3(width * 2, 1, height * 5);
+        transform.position = new Vector3(0, 0, offSetZ);
+        _collider.size = new Vector3(width * 2 * 0.8f, 1, height * 5);
 
-        BuildColumnIndex();
+        BuildColumnCache();
     }
 
-
-    private void BuildColumnIndex()
+    private void BuildColumnCache()
     {
         columnXs.Clear();
+        columnCache.Clear();
 
         foreach (var cell in AllCells)
         {
-            if(cell.IsHidden) continue;
+            if (cell.IsHidden) continue;
             float x = Mathf.Round(cell.transform.position.x * 100f) / 100f;
             if (!columnXs.Contains(x))
                 columnXs.Add(x);
         }
 
         columnXs.Sort();
+
+        for (int i = 0; i < columnXs.Count; i++)
+        {
+            float targetX = columnXs[i];
+            var col = AllCells
+                .Where(c => !c.IsHidden && Mathf.Abs(c.transform.position.x - targetX) < 0.01f)
+                .OrderBy(c => c.transform.position.z)
+                .ToList();
+            columnCache[i] = col;
+        }
     }
+
+    #endregion
+
+    #region COLUMN HANDLING
 
     public int GetNearestColumnX(float worldX)
     {
         if (columnXs.Count == 0)
-            BuildColumnIndex();
+            BuildColumnCache();
 
         float bestDist = float.MaxValue;
         int bestIndex = 0;
@@ -123,20 +148,9 @@ public class GridManager : MonoBehaviour
 
     public List<CellHexa> GetCellsInColumn(int columnIndex)
     {
-        if (columnXs.Count == 0)
-            BuildColumnIndex();
-
-        List<CellHexa> column = new List<CellHexa>();
-        float targetX = columnXs[Mathf.Clamp(columnIndex, 0, columnXs.Count - 1)];
-
-        foreach (var cell in AllCells)
-        {
-            if (Mathf.Abs(cell.transform.position.x - targetX) < 0.01f)
-                column.Add(cell);
-        }
-
-        column.Sort((a, b) => a.transform.position.z.CompareTo(b.transform.position.z));
-        return column;
+        if (columnCache.Count == 0)
+            BuildColumnCache();
+        return columnCache[Mathf.Clamp(columnIndex, 0, columnXs.Count - 1)];
     }
 
     public bool InsertHexaInColumn(HexaItem hexa, int columnIndex, CellHexa targetCell)
@@ -161,19 +175,24 @@ public class GridManager : MonoBehaviour
         column.Sort((a, b) => a.transform.position.z.CompareTo(b.transform.position.z));
 
         int index = column.IndexOf(targetCell);
-        List<CellHexa> movedCells = new List<CellHexa>();
+        List<CellHexa> movedCells = new();
+
         for (int i = column.Count - 1; i > index; i--)
         {
             var below = column[i - 1];
             var current = column[i];
-
-            if (!below.IsEmpty)
+            var top = targetCell;
+            if(i - 2 > 0)
+            {
+                top = column[i - 2];
+            }
+            if (!below.IsEmpty && current.IsEmpty && (top == below || !top.IsEmpty))
             {
                 var item = below.Item;
                 item.MoveToCell(current, moveDuration);
                 below.ClearItem();
                 movedCells.Add(current);
-                result = true; 
+                result = true;
             }
         }
 
@@ -190,10 +209,91 @@ public class GridManager : MonoBehaviour
 
         return result;
     }
+  
 
-    private void CheckAndCollect(CellHexa startCell, float delay = 0f)
+
+    #endregion
+
+    #region COLLECT SYSTEM
+
+    private void CheckAndCollect(CellHexa cell, float delay = 0f)
     {
-        DOVirtual.DelayedCall(delay, () => { StartCoroutine(CollectCascade(startCell)); });
+        if (cell == null || cell.IsEmpty || cell.Item == null) return;
+        pendingCollectChecks.Add(cell);
+        DOVirtual.DelayedCall(delay, TryEnqueueCollect);
+    }
+
+    private void TryEnqueueCollect()
+    {
+        if (pendingCollectChecks.Count == 0)
+            return;
+
+        var groups = new List<(CellHexa cell, int number)>();
+        var visited = new HashSet<CellHexa>();
+
+        foreach (var cell in pendingCollectChecks)
+        {
+            if (cell == null || cell.IsEmpty || visited.Contains(cell))
+                continue;
+
+            var group = FloodFillSameType(cell);
+            if (group.Count >= 3)
+            {
+                groups.Add((cell, cell.Item.Number));
+                foreach (var g in group)
+                    visited.Add(g);
+            }
+        }
+
+        pendingCollectChecks.Clear();
+
+        groups = groups.OrderByDescending(g => g.number).ToList();
+
+        if (groups.Count > 0)
+        {
+            var topGroup = groups.First();
+            if (!collectQueue.Contains(topGroup.cell))
+                collectQueue.Enqueue(topGroup.cell);
+        }
+
+        if (!isCollecting)
+            StartCoroutine(ProcessCollectQueue());
+    }
+
+
+    private IEnumerator ProcessCollectQueue()
+    {
+        isCollecting = true;
+
+        while (collectQueue.Count > 0)
+        {
+            var cell = collectQueue.Dequeue();
+            if (cell == null || cell.IsEmpty) continue;
+            yield return CollectCascade(cell);
+        }
+        bool _lose = true;
+        foreach(var i in AllCells)
+        {
+            if (i.IsEmpty)
+            {
+                _lose = false;
+                break;
+            }
+        }
+        isCollecting = false;
+        if (_lose)
+        {
+            if (GamePlayManager.Instance.State == GamePlayManager.GameState.Playing)
+            {
+                GamePlayManager.Instance.State = GamePlayManager.GameState.Lose;
+                AudioManager.Instance.PlayLose();
+                UIManager.Instance.ShowResult(false, true);
+            }
+        }
+        else
+        {
+            GamePlayManager.Instance.SpawnNextHexa(true);
+        }
     }
 
     private IEnumerator CollectCascade(CellHexa startCell)
@@ -201,77 +301,42 @@ public class GridManager : MonoBehaviour
         if (startCell == null || startCell.IsEmpty || startCell.Item == null)
             yield break;
 
-        if (startCell.Item.IsChecking)
-            yield break;
+        HashSet<CellHexa> processed = new();
+        Queue<CellHexa> queue = new();
 
-        startCell.Item.IsChecking = true;
+        queue.Enqueue(startCell);
 
-        HashSet<CellHexa> processed = new HashSet<CellHexa>();
-        Queue<CellHexa> toCheck = new Queue<CellHexa>();
-
-        toCheck.Enqueue(startCell);
-
-        while (toCheck.Count > 0)
+        while (queue.Count > 0)
         {
-            var current = toCheck.Dequeue();
+            var current = queue.Dequeue();
             if (current == null || current.IsEmpty || processed.Contains(current))
                 continue;
 
             var group = FloodFillSameType(current);
-            HexaItem hexaTemp = null;
+            if (group.Count < 3) continue;
+
+            foreach (var g in group)
+                processed.Add(g);
+
+            yield return WaveCollectEffect(current, group);
+            yield return new WaitForSeconds(Mathf.Clamp(group.Count * 0.05f, 0.25f, 0.6f));
+
             foreach (var g in group)
             {
-                g.Item.IsChecking = true;
-                processed.Add(g);
-                hexaTemp = g.Item;
-            }
-
-            if (group.Count < 3)
-                continue;
-
-            yield return StartCoroutine(WaveCollectEffect(current, group));
-
-
-            yield return new WaitForSeconds(0.45f);
-
-            var neighborCandidates = new HashSet<CellHexa>();
-            foreach (var c in group)
-            {
-                foreach (var n in GetHexNeighbors(c))
+                if (g.Item == null)
                 {
-                    if (n != null && !n.IsEmpty && !processed.Contains(n))
-                    {
-                        if (n.Item.Number == hexaTemp.Number)
-                        {
-                            n.Item.IsChecking = true;
-                            neighborCandidates.Add(n);
-                        }
-                    }
+                    break;
                 }
-            }
-
-            foreach (var candidate in neighborCandidates)
-            {
-                var newGroup = FloodFillSameType(candidate);
-                if (newGroup.Count >= 3 && !processed.Contains(candidate))
+                
+                foreach (var n in GetHexNeighbors(g))
                 {
-                    yield return StartCoroutine(WaveCollectEffect(candidate, newGroup));
-
-                    foreach (var c in newGroup)
+                    if (n.Item == null)
                     {
-                        c.Item.IsChecking = true;
-                        processed.Add(c);
+                        continue;
                     }
-
-                    yield return new WaitForSeconds(0.45f);
-                    foreach (var c in newGroup)
-                    {
-                        foreach (var n in GetHexNeighbors(c))
-                        {
-                            if (n != null && !n.IsEmpty && !processed.Contains(n))
-                                toCheck.Enqueue(n);
-                        }
-                    }
+                    if (n != null && !n.IsEmpty && !processed.Contains(n) &&
+                        n.Item.Number == g.Item.Number)
+                        queue.Enqueue(n);
                 }
             }
         }
@@ -280,8 +345,7 @@ public class GridManager : MonoBehaviour
     private IEnumerator WaveCollectEffect(CellHexa startCell, List<CellHexa> group)
     {
         if (group == null || group.Count == 0) yield break;
-
-        float waveSpeed = 6f;
+        float waveSpeed = 16f;
 
         foreach (var cell in group.OrderBy(c => Vector3.Distance(c.transform.position, startCell.transform.position)))
         {
@@ -289,47 +353,49 @@ public class GridManager : MonoBehaviour
 
             float dist = Vector3.Distance(cell.transform.position, startCell.transform.position);
             float delay = dist / waveSpeed;
-
-            DOVirtual.DelayedCall(delay, () => { cell.Item.Collect(); });
+            DOVirtual.DelayedCall(delay, () => {
+            if (cell.Item != null)
+                {
+                    cell.Item.Collect();
+                }
+            });
         }
 
         yield return new WaitForSeconds(0.25f);
     }
 
+    #endregion
+
+    #region GRID UTILS
+
     public List<CellHexa> FloodFillSameType(CellHexa startCell)
     {
-        List<CellHexa> result = new List<CellHexa>();
-        if (startCell == null || startCell.IsEmpty)
-            return result;
+        List<CellHexa> result = new();
+        if (startCell == null || startCell.IsEmpty) return result;
 
-        var startItem = startCell.Item;
-        int targetNumber = startItem.Number;
+        int targetNumber = startCell.Item.Number;
+        Queue<CellHexa> q = new();
+        HashSet<CellHexa> visited = new();
 
-        Queue<CellHexa> queue = new Queue<CellHexa>();
-        HashSet<CellHexa> visited = new HashSet<CellHexa>();
-
-        queue.Enqueue(startCell);
+        q.Enqueue(startCell);
         visited.Add(startCell);
 
-        while (queue.Count > 0)
+        while (q.Count > 0)
         {
-            var cell = queue.Dequeue();
+            var cell = q.Dequeue();
             result.Add(cell);
 
             foreach (var n in GetHexNeighbors(cell))
             {
                 if (n == null || n.IsEmpty || visited.Contains(n))
                     continue;
-
-                var item = n.Item;
-                if (item.Number == targetNumber)
+                if (n.Item.Number == targetNumber)
                 {
-                    queue.Enqueue(n);
+                    q.Enqueue(n);
                     visited.Add(n);
                 }
             }
         }
-
         return result;
     }
 
@@ -354,14 +420,13 @@ public class GridManager : MonoBehaviour
         {
             int nq = cell.q + dir[0];
             int nr = cell.r + dir[1];
-            var neighbor = AllCells.FirstOrDefault(c => c.q == nq && c.r == nr);
-            if (neighbor != null)
+            if (cellLookup.TryGetValue((nq, nr), out var neighbor))
                 list.Add(neighbor);
         }
-
         return list;
     }
 
+    #endregion
     public CellHexa GetNearestCellUnder(Vector3 worldPos)
     {
         int columnIndex = GetNearestColumnX(worldPos.x);

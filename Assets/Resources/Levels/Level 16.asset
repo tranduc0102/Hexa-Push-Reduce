@@ -12,9 +12,412 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50a1b4d197ed6984aa262179f2e6bb4c, type: 3}
   m_Name: Level 16
   m_EditorClassIdentifier: 
-  width: 0
-  height: 0
+  width: 5
+  height: 5
   target: 220
   spawnPattern: 0300000007000000040000000200000005000000040000000200000003000000060000000600000006000000040000000400000002000000070000000100000001000000
-  CellDatas: []
+  CellDatas:
+  - q: -5
+    r: -5
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: -5
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -3
+    r: -5
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -2
+    r: -5
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -1
+    r: -5
+    isHidden: 0
+    spawnHexaData: 0
+  - q: 0
+    r: -5
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 1
+    r: -5
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 2
+    r: -5
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 3
+    r: -5
+    isHidden: 0
+    spawnHexaData: 0
+  - q: 4
+    r: -5
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -5
+    r: -4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: -4
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -3
+    r: -4
+    isHidden: 0
+    spawnHexaData: 3
+  - q: -2
+    r: -4
+    isHidden: 0
+    spawnHexaData: 3
+  - q: -1
+    r: -4
+    isHidden: 0
+    spawnHexaData: 4
+  - q: 0
+    r: -4
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 1
+    r: -4
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 2
+    r: -4
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 3
+    r: -4
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 4
+    r: -4
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: -3
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: -3
+    isHidden: 0
+    spawnHexaData: 4
+  - q: -3
+    r: -3
+    isHidden: 0
+    spawnHexaData: 2
+  - q: -2
+    r: -3
+    isHidden: 0
+    spawnHexaData: 2
+  - q: -1
+    r: -3
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 0
+    r: -3
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 1
+    r: -3
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 2
+    r: -3
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 3
+    r: -3
+    isHidden: 0
+    spawnHexaData: 2
+  - q: 4
+    r: -3
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: -2
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: -2
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -3
+    r: -2
+    isHidden: 0
+    spawnHexaData: 4
+  - q: -2
+    r: -2
+    isHidden: 0
+    spawnHexaData: 6
+  - q: -1
+    r: -2
+    isHidden: 0
+    spawnHexaData: 1
+  - q: 0
+    r: -2
+    isHidden: 0
+    spawnHexaData: 3
+  - q: 1
+    r: -2
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 2
+    r: -2
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 3
+    r: -2
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 4
+    r: -2
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: -1
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: -1
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -3
+    r: -1
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -2
+    r: -1
+    isHidden: 0
+    spawnHexaData: 5
+  - q: -1
+    r: -1
+    isHidden: 0
+    spawnHexaData: 2
+  - q: 0
+    r: -1
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 1
+    r: -1
+    isHidden: 0
+    spawnHexaData: 4
+  - q: 2
+    r: -1
+    isHidden: 0
+    spawnHexaData: 3
+  - q: 3
+    r: -1
+    isHidden: 0
+    spawnHexaData: 3
+  - q: 4
+    r: -1
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: 0
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -4
+    r: 0
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -3
+    r: 0
+    isHidden: 0
+    spawnHexaData: 4
+  - q: -2
+    r: 0
+    isHidden: 0
+    spawnHexaData: 6
+  - q: -1
+    r: 0
+    isHidden: 0
+    spawnHexaData: 4
+  - q: 0
+    r: 0
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 1
+    r: 0
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 2
+    r: 0
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 3
+    r: 0
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 4
+    r: 0
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: 1
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: 1
+    isHidden: 0
+    spawnHexaData: 6
+  - q: -3
+    r: 1
+    isHidden: 0
+    spawnHexaData: 5
+  - q: -2
+    r: 1
+    isHidden: 0
+    spawnHexaData: 6
+  - q: -1
+    r: 1
+    isHidden: 0
+    spawnHexaData: 2
+  - q: 0
+    r: 1
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 1
+    r: 1
+    isHidden: 0
+    spawnHexaData: 2
+  - q: 2
+    r: 1
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 3
+    r: 1
+    isHidden: 0
+    spawnHexaData: 2
+  - q: 4
+    r: 1
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: 2
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: 2
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -3
+    r: 2
+    isHidden: 0
+    spawnHexaData: 4
+  - q: -2
+    r: 2
+    isHidden: 0
+    spawnHexaData: 3
+  - q: -1
+    r: 2
+    isHidden: 0
+    spawnHexaData: 3
+  - q: 0
+    r: 2
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 1
+    r: 2
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 2
+    r: 2
+    isHidden: 0
+    spawnHexaData: 5
+  - q: 3
+    r: 2
+    isHidden: 0
+    spawnHexaData: 1
+  - q: 4
+    r: 2
+    isHidden: 0
+    spawnHexaData: 0
+  - q: -5
+    r: 3
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: 3
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -3
+    r: 3
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -2
+    r: 3
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -1
+    r: 3
+    isHidden: 0
+    spawnHexaData: 0
+  - q: 0
+    r: 3
+    isHidden: 0
+    spawnHexaData: 7
+  - q: 1
+    r: 3
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 2
+    r: 3
+    isHidden: 0
+    spawnHexaData: 6
+  - q: 3
+    r: 3
+    isHidden: 0
+    spawnHexaData: 0
+  - q: 4
+    r: 3
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -5
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -4
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -3
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -2
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: -1
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: 0
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: 1
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: 2
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: 3
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
+  - q: 4
+    r: 4
+    isHidden: 1
+    spawnHexaData: 0
   spaw: 3,7,4,2,5,4,2,3,6,6,6,4,4,2,7,1,1
+  offSetY: 3.5
+  camSize: 7.5
+  offsetZCam: -9

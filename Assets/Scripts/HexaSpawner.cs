@@ -31,6 +31,7 @@ public class HexaSpawner : MonoBehaviour
         var hexa = hexaPool.Dequeue();
         hexa.gameObject.SetActive(true);
         hexa.transform.localPosition = Vector3.zero;
+        hexa.ShowHightLigh(false);
         return hexa;
     }
     public void ReturnToPool(HexaItem hexa)

@@ -44,7 +44,7 @@ public class CellHexa : MonoBehaviour
         _colorTween?.Kill();
 
         _colorTween = _render.material
-            .DOColor(color, 0.15f)
+            .DOColor(color, 0.15f).SetAutoKill(true)
             .SetEase(Ease.OutQuad);
 
         if (_txt != null)

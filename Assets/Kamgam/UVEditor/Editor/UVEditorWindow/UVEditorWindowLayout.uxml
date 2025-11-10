@@ -1,0 +1,41 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Kamgam/UVEditor/Editor/UVEditorWindow/UVEditorWindowStyleSheet.uss?fileID=7433441132597879392&amp;guid=190b7c39342647441b8418c05035e434&amp;type=3#UVEditorWindowStyleSheet" />
+    <ui:VisualElement name="Container" class="object-selected" style="flex-grow: 1;">
+        <ui:VisualElement name="SelectionMenu" style="height: 22px; background-color: rgb(32, 32, 32); flex-direction: row;">
+            <uie:ObjectField label="Object" name="SelectedObject" tooltip="What object to focus on (the mesh list dropdown will show all the meshes that are attached to this object or children of this object)." style="min-width: 220px; flex-grow: 1;" />
+            <ui:DropdownField name="SelectedSubMeshIndex" tooltip="The sub mesh index that will be used by any operation that changes textures or materials since each sub mesh can have a different material/texture." label="SubMesh" choices="0" />
+            <ui:DropdownField index="0" choices="UV0,UV1,UV2,UV3,UV4" name="UVDropDown" tooltip="Choose what UV channel to edit." />
+        </ui:VisualElement>
+        <ui:VisualElement name="ErrorNoObjectSelected" class="p-10 hidden-if-object-selected" style="flex-grow: 1;">
+            <ui:Label text="No object selected!" display-tooltip-when-elided="true" name="Title" class="h1 error" />
+            <ui:Label text="To start editing please drop an object with a mesh into the &quot;Object&quot; field above or below.&#10;&#10;" display-tooltip-when-elided="true" class="mt-10" style="white-space: normal;" />
+            <uie:ObjectField name="SelectedObjectBig" tooltip="What object to focus on (the mesh list dropdown will show all the meshes that are attached to this object or children of this object)." style="min-width: 220px; flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ObjectSelectedContainer" class="visible-if-object-selected" style="flex-grow: 1;">
+            <ui:VisualElement name="TopMenu" style="height: 22px; background-color: rgb(32, 32, 32); flex-direction: row;">
+                <ui:Button text="[ ]" display-tooltip-when-elided="true" name="RecenterButton" tooltip="Recenters the view on the 0-1 range." />
+                <ui:Button text="Focus" display-tooltip-when-elided="true" name="FocusButton" tooltip="Focuses the view on the selected UVs" />
+                <ui:Button text="B/W" display-tooltip-when-elided="true" name="UVGridColorToggle" tooltip="Toggles between black and white UV lines." />
+                <ui:Button text="Clear" display-tooltip-when-elided="true" name="ClearSelectionButton" tooltip="Clears the selection." />
+                <ui:Label text="|" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+                <ui:Button text="Tris" display-tooltip-when-elided="true" name="TrianglesSelectButton" tooltip="Enables the &quot;Select Triangles&quot; Mode which allows you to select triangles in the scene view." />
+                <ui:Button text="SL" display-tooltip-when-elided="true" name="TrianglesSelectLinkedButton" tooltip="Select Linked triangles. Very handy for selecting UVs from a mesh in the scene view." />
+                <ui:DropdownField index="0" choices="All,Selected" name="TrianglesUVFilterDropDown" tooltip="Use to filter the shown UVs. Handy for overlapping UVs." />
+                <ui:Label text="|" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+                <ui:Button text="Vertices" display-tooltip-when-elided="true" name="VerticesSelectButton" tooltip="Enables the default &quot;Select Vertices&quot; mode. Disables the &quot;Select Triangles&quot; mode." />
+                <ui:Button text="SI" display-tooltip-when-elided="true" name="VerticesSelectLinkedButton" tooltip="Select UV Island: Selects all UVs that are linked to the currently selected vertices." />
+                <ui:Label text="|" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+                <ui:Button text="Texture" display-tooltip-when-elided="true" name="EditTextureButton" tooltip="Toggles the texture movement mode." />
+                <ui:Button text="Crop" display-tooltip-when-elided="true" name="EditCropTextureButton" tooltip="Toggle the crop texture mode." />
+            </ui:VisualElement>
+            <ui:VisualElement name="Canvas" style="flex-grow: 1;" />
+            <ui:VisualElement name="BottomMenu" style="height: 22px; background-color: rgb(32, 32, 32); flex-direction: row; justify-content: flex-start;">
+                <ui:Button text="Apply" display-tooltip-when-elided="true" name="ApplyButton" style="flex-grow: 1;" />
+                <ui:Toggle label="Live" name="LiveUVsToggle" style="flex-shrink: 1; width: 60px; justify-content: space-between; align-items: center; flex-direction: row;" />
+                <ui:TextField picking-mode="Ignore" text="1024" name="CropWidth" class="crop-bottom-toolbar" style="width: 38px;" />
+                <ui:Label text="x" display-tooltip-when-elided="true" name="CropResDivider" class="crop-bottom-toolbar" style="-unity-text-align: middle-left;" />
+                <ui:TextField picking-mode="Ignore" text="1024" name="CropHeight" class="crop-bottom-toolbar" style="width: 38px;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

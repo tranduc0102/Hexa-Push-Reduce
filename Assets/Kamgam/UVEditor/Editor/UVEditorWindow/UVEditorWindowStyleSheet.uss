@@ -1,0 +1,151 @@
+.h1 {
+    font-size: 20px;
+    -unity-font-style: bold;
+}
+
+.m-1 {
+    margin: 1px;
+}
+
+.m-2 {
+    margin: 2px;
+}
+
+.m-3 {
+    margin: 3px;
+}
+
+.m-4 {
+    margin: 4px;
+}
+
+.m-5 {
+    margin: 5px;
+}
+
+.m-6 {
+    margin: 6px;
+}
+
+.m-7 {
+    margin: 7px;
+}
+
+.m-8 {
+    margin: 8px;
+}
+
+.m-9 {
+    margin: 9px;
+}
+
+.m-10 {
+    margin: 10px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.p-1 {
+    padding: 1px;
+}
+
+.p-2 {
+    padding: 2px;
+}
+
+.p-3 {
+    padding: 3px;
+}
+
+.p-4 {
+    padding: 4px;
+}
+
+.p-5 {
+    padding: 5px;
+}
+
+.p-6 {
+    padding: 6px;
+}
+
+.p-7 {
+    padding: 7px;
+}
+
+.p-8 {
+    padding: 8px;
+}
+
+.p-9 {
+    padding: 9px;
+}
+
+.p-10 {
+    padding: 10px;
+}
+
+.error {
+    color: rgb(255, 142, 68);
+}
+
+.light-skin Label {
+    color: rgb(68, 68, 68);
+}
+
+.visible-if-object-selected {
+    display: none;
+}
+
+.object-selected .visible-if-object-selected {
+    display: flex;
+}
+
+.hidden-if-object-selected {
+    display: flex;
+}
+
+.object-selected .hidden-if-object-selected {
+    display: none;
+}
+
+#Canvas {
+    overflow: hidden;
+}
+
+.scale-corner-gizmo {
+    background-color: rgb(255, 255, 0);
+}
+
+.crop-corner-gizmo {
+    background-color: rgb(255, 255, 255);
+}
+
+.unity-toggle__label {
+    min-width: 40px;
+}
+
+.unity-popup-field__label {
+    min-width: 40px;
+}
+
+.unity-popup-field__input {
+    min-width: 40px;
+}
+
+.unity-object-field__label {
+    min-width: 40px;
+}
+
+/* Hide the object field inner element in the big drop object drop target object field */
+#SelectedObjectBig ObjectFieldSelector,
+#SelectedObjectBig Image,
+{
+    visibility: hidden;
+}
+#SelectedObjectBig Label
+{
+    -unity-text-align: Middle-Center;
+}

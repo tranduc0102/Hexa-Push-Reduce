@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using DG.Tweening;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using DG.Tweening;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class HexaDragController : MonoBehaviour
 {
@@ -25,6 +28,15 @@ public class HexaDragController : MonoBehaviour
     private CellHexa nearest = null;
     private Vector3 _lastMousePos;
 
+
+
+    [Header("Camera Setting")]
+    [SerializeField] private Camera _cam;
+    [SerializeField] private float _offsetZoomSize;
+    [SerializeField] private float _timeZoom;
+    [SerializeField] private float _offsetMoveY;
+    private Vector3 _dragOffset;
+    private bool _isZoom;
     public void Init()
     {
         float minCellX = gridManager.AllCells.Min(c => c.transform.position.x);
@@ -32,11 +44,16 @@ public class HexaDragController : MonoBehaviour
         float padding = 0.4f;
         minX = minCellX - padding;
         maxX = maxCellX + padding;
+        if (currentHexa)
+        {
+            GamePlayManager.Instance.HexaSpawner.ReturnToPool(currentHexa);
+            currentHexa = null;
+        }
     }
 
     private void Update()
     {
-        if (currentHexa == null) return;
+        if (currentHexa == null || GamePlayManager.Instance.State != GamePlayManager.GameState.Playing || IsPointerOverUIElement()) return;
 
         float currentY = NormalizeAngle(GamePlayManager.Instance.Grid.transform.eulerAngles.y);
         bool gridAtBaseRotation = Mathf.Abs(currentY - baseYRotation) <= angleTolerance;
@@ -50,47 +67,60 @@ public class HexaDragController : MonoBehaviour
                 {
                     _canDragBoard = true;
                     _lastMousePos = Input.mousePosition;
+                    if(currentHighlightCell != null)
+                    {
+                        currentHighlightCell.HideHighLight();
+                    }
                     return;
                 }
             }
-
             if (!gridAtBaseRotation) return;
-
             isDragging = true;
             dragStartPos = currentHexa.transform.position;
+            Plane groundPlane = new Plane(Vector3.up, dragStartPos);
+            if (groundPlane.Raycast(ray, out float distance))
+            {
+                Vector3 hitPoint = ray.GetPoint(distance);
+                _dragOffset = dragStartPos - hitPoint; 
+            }
         }
 
         if (_canDragBoard && Input.GetMouseButton(0))
         {
             Vector3 delta = Input.mousePosition - _lastMousePos;
-            float rotateY = -delta.x * rotationSpeed * Time.deltaTime;
+            float rotateY = -delta.x * rotationSpeed;
 
-            Vector3 currentRotation = GamePlayManager.Instance.Grid.transform.eulerAngles;
-            float targetY = NormalizeAngle(currentRotation.y + rotateY);
-            float minY = baseYRotation - maxAngleOffset;
-            float maxY = baseYRotation + maxAngleOffset;
-            targetY = Mathf.Clamp(targetY, minY, maxY);
+            float targetY = GamePlayManager.Instance.Grid.transform.eulerAngles.y + rotateY;
+            targetY = NormalizeAngle(targetY);
+            targetY = Mathf.Clamp(targetY, baseYRotation - maxAngleOffset, baseYRotation + maxAngleOffset);
 
-            Quaternion targetRot = Quaternion.Euler(0, targetY, 0);
-            GamePlayManager.Instance.Grid.transform.rotation = Quaternion.Lerp(
-                GamePlayManager.Instance.Grid.transform.rotation,
-                targetRot,
-                15f * Time.deltaTime
-            );
+            GamePlayManager.Instance.Grid.transform.rotation = Quaternion.Euler(0, targetY, 0);
 
             _lastMousePos = Input.mousePosition;
+            ZoomCamera(true);
+            currentHexa.ShowHightLigh(false);
         }
 
         if (_canDragBoard && Input.GetMouseButtonUp(0))
         {
             _canDragBoard = false;
+            if (currentHighlightCell != null)
+            {
+                currentHexa.ShowHightLigh(true);
+                currentHighlightCell.HighLight(currentHexa.Color);
+            }
+            else
+            {
+                currentHexa.ShowHightLigh(true, true);
 
+            }
             GamePlayManager.Instance.Grid.transform
-                .DORotate(new Vector3(0, baseYRotation, 0), 0.6f)
-                .SetEase(Ease.OutBack);
+                    .DORotate(new Vector3(0, baseYRotation, 0), 0.6f)
+                    .SetEase(Ease.OutBack);
+            ZoomCamera(false);
         }
 
-        if (!_canDragBoard)
+        if (!_canDragBoard && !DOTween.IsTweening(GamePlayManager.Instance.Grid.transform))
         {
             Quaternion currentRot = GamePlayManager.Instance.Grid.transform.rotation;
             Quaternion targetRot = Quaternion.Euler(0, baseYRotation, 0);
@@ -106,15 +136,16 @@ public class HexaDragController : MonoBehaviour
             if (!gridAtBaseRotation) return;
 
             Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+            Plane groundPlane = new Plane(Vector3.up, dragStartPos);
+           
             if (groundPlane.Raycast(ray, out float distance))
             {
                 Vector3 hitPoint = ray.GetPoint(distance);
 
-                Vector3 targetPos = currentHexa.transform.position;
-                targetPos.x = Mathf.Clamp(hitPoint.x, minX, maxX);
+                Vector3 targetPos = hitPoint + _dragOffset;
+                targetPos.x = Mathf.Clamp(targetPos.x, minX, maxX);
                 targetPos.z = dragStartPos.z;
-                targetPos.y = currentHexa.transform.position.y;
+                targetPos.y = dragStartPos.y;
 
                 currentHexa.transform.position = Vector3.Lerp(
                     currentHexa.transform.position,
@@ -126,17 +157,23 @@ public class HexaDragController : MonoBehaviour
                 if (nearest != currentHighlightCell)
                 {
                     if (currentHighlightCell != null)
+                    {
+                        currentHexa.ShowHightLigh(true, true);
                         currentHighlightCell.HideHighLight();
+                    }
 
                     if (nearest != null)
+                    {
                         nearest.HighLight(currentHexa.GetTransparentColor());
+                        currentHexa.ShowHightLigh(true);
+                    }
+
 
                     currentHighlightCell = nearest;
                 }
             }
         }
 
-        // --- Thả Hexa ---
         if (isDragging && Input.GetMouseButtonUp(0))
         {
             isDragging = false;
@@ -149,13 +186,12 @@ public class HexaDragController : MonoBehaviour
 
             int columnX = gridManager.GetNearestColumnX(currentHexa.transform.position.x);
             bool placed = gridManager.InsertHexaInColumn(currentHexa, columnX, nearest);
-            nearest = null;
-
             if (placed)
             {
-                currentHexa = GamePlayManager.Instance.SpawnNextHexa();
-                SetCurrentHexa(currentHexa);
+                currentHexa.ShowHightLigh(false);
+                currentHexa = null;
             }
+            nearest = null;
         }
     }
 
@@ -165,9 +201,95 @@ public class HexaDragController : MonoBehaviour
         while (angle < -180f) angle += 360f;
         return angle;
     }
+    private void ZoomCamera(bool isZoomOut)
+    {
+        if (_isZoom == isZoomOut) return; 
+
+        _cam.DOKill(true);
+        if (currentHexa != null)
+            currentHexa.transform.DOKill(true);
+
+        float duration = 0.5f;
+        Ease easeType = Ease.OutCubic; 
+
+        if (isZoomOut)
+        {
+            _cam.DOOrthoSize(_cam.orthographicSize + _offsetZoomSize, duration)
+                .SetEase(easeType);
+
+            if (currentHexa != null)
+            {
+                currentHexa.transform.DOLocalMoveY(_offsetMoveY, duration)
+                    .SetEase(Ease.OutBack);
+            }
+
+            _isZoom = true;
+        }
+        else
+        {
+            _cam.DOOrthoSize(_cam.orthographicSize - _offsetZoomSize, duration)
+                .SetEase(easeType);
+
+            if (currentHexa != null)
+            {
+                currentHexa.transform.DOLocalMoveY(0f, duration)
+                    .SetEase(Ease.OutCubic);
+            }
+
+            _isZoom = false;
+        }
+    }
+
 
     public void SetCurrentHexa(HexaItem hexa)
     {
         currentHexa = hexa;
+        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            Vector3 hitPoint = ray.GetPoint(distance);
+            nearest = gridManager.GetNearestCellUnder(currentHexa.transform.position);
+            if(nearest == null)
+            {
+                currentHexa.ShowHightLigh(true, true);
+            }
+            if (nearest != currentHighlightCell)
+            {
+                if (currentHighlightCell != null)
+                {
+                    currentHighlightCell.HideHighLight();
+                }
+
+                if (nearest != null)
+                {
+                    nearest.HighLight(currentHexa.GetTransparentColor());
+                    currentHexa.ShowHightLigh(true);
+                }
+
+                currentHighlightCell = nearest;
+            }
+        }
+    }
+
+    private bool IsPointerOverUIElement()
+    {
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerEventData, results);
+
+        foreach (RaycastResult unused in results)
+        {
+            if (unused.gameObject.layer == LayerMask.NameToLayer("UI"))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

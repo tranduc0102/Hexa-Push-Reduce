@@ -114,3 +114,6 @@ MonoBehaviour:
     isHidden: 0
     spawnHexaData: 2
   spaw: 
+  offSetY: 2
+  camSize: 6
+  offsetZCam: -9
