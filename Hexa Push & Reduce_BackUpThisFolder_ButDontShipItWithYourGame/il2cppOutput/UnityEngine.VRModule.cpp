@@ -214,7 +214,7 @@ inline void Action_1_Invoke_m690438AAE38F9762172E3AE0A33D0B42ACD35790_inline (Ac
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 41888
+// Method Definition Index: 41910
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XRDevice_DisableAutoXRCameraTracking_m1243FCAD2AC9C4D5C2E551255A1B2BA266E12A52 (Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___0_camera, bool ___1_disabled, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -266,7 +266,7 @@ IL_0023:
 		return;
 	}
 }
-// Method Definition Index: 41889
+// Method Definition Index: 41911
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XRDevice_InvokeDeviceLoaded_mBE2198DE44A72E2F5059566C46B9907D82782790 (String_t* ___0_loadedDeviceName, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -297,7 +297,7 @@ IL_001b:
 		return;
 	}
 }
-// Method Definition Index: 41890
+// Method Definition Index: 41912
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XRDevice_DisableAutoXRCameraTracking_Injected_mFA485CB637DF2D2908DCEC6D92FE873214515FEE (intptr_t ___0_camera, bool ___1_disabled, const RuntimeMethod* method) 
 {
 	typedef void (*XRDevice_DisableAutoXRCameraTracking_Injected_mFA485CB637DF2D2908DCEC6D92FE873214515FEE_ftn) (intptr_t, bool);
@@ -309,7 +309,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XRDevice_DisableAutoXRCameraTracking_Inj
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-// Method Definition Index: 28990
+// Method Definition Index: 28996
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR intptr_t MarshalledUnityObject_MarshalNotNull_TisRuntimeObject_mEB1AA6B672D00242BB9DCE007056EC0E9C8DB075_gshared_inline (RuntimeObject* ___0_obj, const RuntimeMethod* method) 
 {
 	intptr_t V_0;

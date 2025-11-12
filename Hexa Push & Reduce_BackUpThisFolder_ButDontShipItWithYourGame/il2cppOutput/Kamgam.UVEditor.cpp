@@ -683,7 +683,7 @@ inline void List_1_AddWithResize_m79A9BF770BEF9C06BE40D5401E55E375F2726CC4 (List
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 41897
+// Method Definition Index: 41919
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR MonoScriptData_t1AE22E75E56C3A1F1F84B5B7DE6C7A1479CF7B54 UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mCB686E71A96DD647B7F0BCCDF69E3D985AD8EEB1 (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -717,7 +717,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR MonoScriptData_t1AE22E75E56C3A1F1F84B5B7DE6C7
 		return L_6;
 	}
 }
-// Method Definition Index: 41898
+// Method Definition Index: 41920
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_m4F8105B12E8C05639CC802EF7A54691D789198D1 (UnitySourceGeneratedAssemblyMonoScriptTypes_v1_t563E773B34C6395FE1510D0E9AADCB954D2FBF99* __this, const RuntimeMethod* method) 
 {
 	{
@@ -803,7 +803,7 @@ IL2CPP_EXTERN_C void MonoScriptData_t1AE22E75E56C3A1F1F84B5B7DE6C7A1479CF7B54_ma
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 41899
+// Method Definition Index: 41921
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData_definePaths_mB39484AF21C81F35C832320FEFF553102E017F80 (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -835,7 +835,7 @@ IL_0013:
 		return;
 	}
 }
-// Method Definition Index: 41900
+// Method Definition Index: 41922
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR List_1_tF470A3BE5C1B5B68E1325EF3F109D172E60BD7CD* BoneData_GetPaths_m78AA540E6C870D847E4E42B878004EA83E73EF44 (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, const RuntimeMethod* method) 
 {
 	{
@@ -846,7 +846,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR List_1_tF470A3BE5C1B5B68E1325EF3F109D172E60BD
 		return L_0;
 	}
 }
-// Method Definition Index: 41901
+// Method Definition Index: 41923
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData_ExtractFromRenderer_m81C4C2391AE70432C84FB61FD24C396D78435E3B (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, SkinnedMeshRenderer_t020C4E8648EA1C4C6BA5C41502919B387E7E1C2E* ___0_renderer, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -986,7 +986,7 @@ IL_0073:
 		return;
 	}
 }
-// Method Definition Index: 41902
+// Method Definition Index: 41924
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR TransformU5BU5D_tBB9C5F5686CAE82E3D97D43DF0F3D68ABF75EC24* BoneData_FindBonesRelativeTo_mEB1036467CE00D6EFFD0BACF054A93055C0F202A (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_rootBone, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1099,7 +1099,7 @@ IL_0067:
 		return L_21;
 	}
 }
-// Method Definition Index: 41903
+// Method Definition Index: 41925
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData_ResolveAndApplyTo_mC03DBF9F87C88F4F3D5E9972B60595F631BE863A (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_rootBone, GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___1_gameObject, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1124,7 +1124,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData_ResolveAndApplyTo_mC03DBF9F87C8
 		return;
 	}
 }
-// Method Definition Index: 41904
+// Method Definition Index: 41926
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData_ResolveAndApplyTo_m1D4F57F53E3B330455C3094D98668208A944BBC3 (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_rootBone, SkinnedMeshRenderer_t020C4E8648EA1C4C6BA5C41502919B387E7E1C2E* ___1_renderer, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1193,7 +1193,7 @@ IL_002a:
 		return;
 	}
 }
-// Method Definition Index: 41905
+// Method Definition Index: 41927
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* BoneData_getPathRelativeTo_m5EB9EB85250A73F3BFD5C5E368BE74353DB14AD8 (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_target, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___1_root, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1285,7 +1285,7 @@ IL_0044:
 		return L_16;
 	}
 }
-// Method Definition Index: 41906
+// Method Definition Index: 41928
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* BoneData_CreateTransforms_m5E048D791B49F35DA24FC704C466019CD7EC26AE (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_parentOfRootBone, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1765,7 +1765,7 @@ IL_0247:
 		return L_103;
 	}
 }
-// Method Definition Index: 41907
+// Method Definition Index: 41929
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* BoneData_createTransformInParent_m17BB019A3AF4DD15378A56EAE85FF084854573E9 (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_parent, String_t* ___1_name, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1829,7 +1829,7 @@ IL_001c:
 		return L_13;
 	}
 }
-// Method Definition Index: 41908
+// Method Definition Index: 41930
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData__ctor_mD9948BD6B36C261947E59D863205FC9DCFE86C12 (BoneData_tDA07778E2078EC33A7A94B383F2CB18B9FF8B850* __this, const RuntimeMethod* method) 
 {
 	{
@@ -1845,7 +1845,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneData__ctor_mD9948BD6B36C261947E59D86
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 41909
+// Method Definition Index: 41931
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR SkinnedMeshRenderer_t020C4E8648EA1C4C6BA5C41502919B387E7E1C2E* BoneDataResolver_get_Renderer_m18A31F34D2AF577FEAFEC24F0748E50301F96BC0 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1881,7 +1881,7 @@ IL_001a:
 		return L_3;
 	}
 }
-// Method Definition Index: 41910
+// Method Definition Index: 41932
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool BoneDataResolver_RendererHasValidBones_mEE2AF018D656535764ABC7C663932396069B82FA (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -1934,7 +1934,7 @@ IL_002f:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 41911
+// Method Definition Index: 41933
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneDataResolver_OnEnable_m66363BC4E5788C9949712069DBEE87DADD0E3CE4 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, const RuntimeMethod* method) 
 {
 	{
@@ -1965,7 +1965,7 @@ IL_0017:
 		return;
 	}
 }
-// Method Definition Index: 41912
+// Method Definition Index: 41934
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool BoneDataResolver_Resolve_m75A8AD2566DC766A7BDEFE078A6DB8ACEEB291DD (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2353,7 +2353,7 @@ IL_01aa:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 41913
+// Method Definition Index: 41935
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool BoneDataResolver_Resolve_m8A48270AD402EB577896ADAD5A209F1A75A1FE02 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___0_rootBone, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2390,7 +2390,7 @@ IL_000b:
 		return L_4;
 	}
 }
-// Method Definition Index: 41914
+// Method Definition Index: 41936
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool BoneDataResolver_Resolve_m452D41446A58F170C519391D0374D4CBC5FCD3C1 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_rootBone, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2483,7 +2483,7 @@ IL_0072:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 41915
+// Method Definition Index: 41937
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool BoneDataResolver_Resolve_m228E19AB6673F80406D2D45DAB2E8A82217572B2 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, SkinnedMeshRenderer_t020C4E8648EA1C4C6BA5C41502919B387E7E1C2E* ___0_renderer, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2620,7 +2620,7 @@ IL_009a:
 		return (bool)0;
 	}
 }
-// Method Definition Index: 41916
+// Method Definition Index: 41938
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* BoneDataResolver_CreateTransforms_m1306DD5CFEC49C35CB3FF0E91A747502C7002A6B (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* ___0_parentOfRootBone, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2656,7 +2656,7 @@ IL_0010:
 		return L_4;
 	}
 }
-// Method Definition Index: 41917
+// Method Definition Index: 41939
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneDataResolver_AssignNullTransforms_m5E5E80366F34EE867A5B1DD21819B6D1EEF8BB38 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2776,7 +2776,7 @@ IL_0089:
 		return;
 	}
 }
-// Method Definition Index: 41918
+// Method Definition Index: 41940
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneDataResolver__ctor_mE6278A8451639CF0D768CC844E16870A4EA3B7D4 (BoneDataResolver_tBE248DB28B002D91C1F9D6D2C88944DFF8A3AFB0* __this, const RuntimeMethod* method) 
 {
 	{
@@ -2796,7 +2796,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void BoneDataResolver__ctor_mE6278A8451639CF0
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 #pragma clang diagnostic ignored "-Wunused-variable"
 #endif
-// Method Definition Index: 41919
+// Method Definition Index: 41941
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SceneViewDrawer__ctor_m1E17E713CFB1CBCB1FB34244350F5CDE439CA70C (SceneViewDrawer_t16114DE09C8BA581B32900FBACF386BD946AF10C* __this, const RuntimeMethod* method) 
 {
 	{
@@ -2831,7 +2831,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void SceneViewDrawer__ctor_m1E17E713CFB1CBCB1
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-// Method Definition Index: 28284
+// Method Definition Index: 28285
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Vector3__ctor_m5F87930F9B0828E5652E2D9D01ED907C01122C86_inline (Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2* __this, float ___0_x, float ___1_y, const RuntimeMethod* method) 
 {
 	{
@@ -2843,7 +2843,7 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Vector3__ctor_m5F87930F9B082
 		return;
 	}
 }
-// Method Definition Index: 28303
+// Method Definition Index: 28304
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 Vector3_get_one_mC9B289F1E15C42C597180C9FE6FB492495B51D02_inline (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2866,7 +2866,7 @@ IL_0009:
 		return L_1;
 	}
 }
-// Method Definition Index: 28332
+// Method Definition Index: 28333
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 Quaternion_get_identity_m7E701AE095ED10FD5EA0B50ABCFDE2EEFF2173A5_inline (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;
@@ -2889,7 +2889,7 @@ IL_0009:
 		return L_1;
 	}
 }
-// Method Definition Index: 28302
+// Method Definition Index: 28303
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 Vector3_get_zero_m0C1249C3F25B1C70EAD3CC8B31259975A457AE39_inline (const RuntimeMethod* method) 
 {
 	static bool s_Il2CppMethodInitialized;

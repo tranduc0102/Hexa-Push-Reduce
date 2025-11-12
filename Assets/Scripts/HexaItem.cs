@@ -55,10 +55,10 @@ public class HexaItem : MonoBehaviour
 
         }
         _canCollected = true;
-        m_SpriteRenderer.color = _color;
+        m_SpriteRenderer.color = _color * 1.2f;
     }
 
- 
+
     public void SetCellHexa(CellHexa cell)
     {
         _currentCell = cell;

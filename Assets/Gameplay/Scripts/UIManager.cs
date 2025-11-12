@@ -39,6 +39,13 @@ public class UIManager : MonoBehaviour
     [Header("Lose")]
     [SerializeField] private CanvasGroup _lose;
     [SerializeField] private Button _btnReplay;
+    [Space]
+    [Header("Tut")]
+    [SerializeField] private Button _tutBtn;
+    [SerializeField] private Button _tutClose1;
+    [SerializeField] private Button _tutClose2;
+    [SerializeField] private CanvasGroup _popTut;
+
 
 
     private void Awake()
@@ -48,6 +55,19 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        _tutBtn.onClick.AddListener(() =>
+        {
+            Time.timeScale = 0;
+            ShowPopup(_popTut, true);
+        });
+        _tutClose1.onClick.AddListener(() =>
+        {
+           CloseTut();
+        });
+        _tutClose2.onClick.AddListener(() =>
+        {
+            CloseTut();
+        });
         _btnNextLevel.onClick.AddListener(() =>
         {
             ShowResult(true, false, GamePlayManager.Instance.NextLevel);
@@ -84,7 +104,11 @@ public class UIManager : MonoBehaviour
         });
 
     }
-
+    public void CloseTut()
+    {
+        Time.timeScale = 1;
+        ShowPopup(_popTut, false);
+    }
     public void UpdateTime(float time)
     {
         int minutes = Mathf.FloorToInt(time / 60f);

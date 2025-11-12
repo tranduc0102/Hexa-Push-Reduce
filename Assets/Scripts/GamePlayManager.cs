@@ -45,11 +45,13 @@ public class GamePlayManager : MonoBehaviour
         Instance = this;
         DOTween.SetTweensCapacity(1000, 200);
         DOTween.useSmoothDeltaTime = true;
+        Application.targetFrameRate = 60;
     }
     private void Start()
     {
+        LoadLevvel(Level);
     }
-    int level = 0;
+  /*  int level = 0;
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
@@ -62,7 +64,7 @@ public class GamePlayManager : MonoBehaviour
             level -= 1;
             LoadLevvel(level);
         }
-    }
+    }*/
     public void LoadLevvel(int level)
     {
         _currentLevel = Resources.Load<LevelData>("Levels/Level " + level);
@@ -73,7 +75,11 @@ public class GamePlayManager : MonoBehaviour
         _spawnIndex = 0;
         grid.GeneratorGrid(_currentLevel.width, _currentLevel.height, _currentLevel.CellDatas, _currentLevel.offSetY);
         camera.transform.localPosition = new Vector3(camera.transform.localPosition.x, camera.transform.localPosition.y, _currentLevel.offsetZCam);
-        camera.orthographicSize = _currentLevel.camSize;
+        float targetAspect = 1080f/1920f;
+        float currentAspect = (float)Screen.width / Screen.height;
+
+        float scaleFactor = targetAspect / currentAspect; 
+        camera.orthographicSize = _currentLevel.camSize * scaleFactor;
         _hexaDragController.Init();
         _state = GameState.Playing;
         SpawnNextHexa(false);
